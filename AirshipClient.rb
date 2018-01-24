@@ -8,10 +8,10 @@ client = AirshipClient.new('c1087mh6a3hjxiaz')
 
 1. Error checking for the keys
 2. identify and gate endpoint
-client.get_value('<control_name>', <user_obj>)     -> [false, true]
-client.get_variation('<control_name>', <user_obj>) -> [nil, '<variation1>', '<variation2'>, ...]
-client.identify([<user_obj>, ...])                 -> dictionary
-client.gate(<user_obj>)                            -> dictionary
+client.get_value('<control_name>', <obj>)     -> [false, true]
+client.get_variation('<control_name>', <obj>) -> [nil, '<variation1>', '<variation2'>, ...]
+client.identify([<obj>, ...])                 -> dictionary
+client.gate(<obj>)                            -> dictionary
 =end
 
 V1_IDENTIFY_ENDPOINT = 'https://api.airshiphq.com/v1/identify'
@@ -100,19 +100,19 @@ class AirshipClient
     nil
   end
 
-  def identify(control_name, user_obj)
+  def identify(control_name, obj)
 
   end
 
-  def gate(control_name, user_obj)
+  def gate(control_name, obj)
 
   end
 
-  def get_value(control_name, user_obj)
+  def get_value(control_name, obj)
 
   end
 
-  def get_variation(control_name, user_obj)
+  def get_variation(control_name, obj)
 
   end
 end
