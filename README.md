@@ -13,9 +13,11 @@ AirshipClient.init(<api_key>, <env_key>)
 
 # e.g.,
 # AirshipClient.init("r9b72kqdh1wbzkpkf7gntwfapqoc26bl", "nxmqp35umrd3djth")
+
+# Create a new client
 client = AirshipClient.new
 
-# Override env_key on an instance basis (nil means do not override that particular param)
+# Override env_key on an instance basis (nil means do not override that particular param, in this case the api_key)
 client = AirshipClient.new(nil, "vuvl5bn7btteq8vl")
 
 
