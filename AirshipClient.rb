@@ -119,7 +119,7 @@ class AirshipClient
         req.body = request_obj.to_json
       end
     rescue Faraday::TimeoutError => e
-
+      raise
     end
   end
 
@@ -137,7 +137,22 @@ class AirshipClient
         req.body = request_obj.to_json
       end
     rescue Faraday::TimeoutError => e
-
+      if @@fail_gracefully
+        return {
+          "type" => obj["type"],
+          "id" => obj["id"],
+          "display_name" => obj["display_name"],
+          "control" => {
+            "control_short_name" => control_name,
+            "value" => false,
+            "variation" => nil,
+            "from_server" => false,
+            "from_cache" => false
+          }
+        }
+      else
+        raise
+      end
     end
   end
 
