@@ -37,6 +37,8 @@ object = {
   "display_name" => "ironman@stark.com"
 }
 
+client.identify(object)
+client.identify([object])
 client.gate("bitcoin-pay", object)
 client.get_value("bitcoin-pay", object)
 client.get_variation("bitcoin-pay", object)
