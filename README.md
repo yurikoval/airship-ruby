@@ -32,12 +32,12 @@ client = AirshipClient.new(nil, "vuvl5bn7btteq8vl")
 #    - Convenience method for getting the variation associated with a multi-variate control/flag
 
 object = {
-  "type" => "User", # "type" starts with a capital letter '[U]ser', '[H]ome', '[C]ar'
+  "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar"
   "id" => "1234",
   "display_name" => "ironman@stark.com"
 }
 
-client.gate('bitcoin-pay', object)
-client.get_value('bitcoin-pay', object)
-client.get_variation('bitcoin-pay', object)
+client.gate("bitcoin-pay", object)
+client.get_value("bitcoin-pay", object)
+client.get_variation("bitcoin-pay", object)
 ```
