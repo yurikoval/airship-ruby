@@ -27,8 +27,8 @@ SERVER_INFO_KEY = "server_info"
 class AirshipClient
   @@api_key = nil
   @@env_key = nil
-  @@timeout = nil
-  @@fail_gracefully = nil
+  @@timeout = DEFAULT_TIMEOUT
+  @@fail_gracefully = true
 
   @api_key = nil
   @env_key = nil
@@ -107,29 +107,37 @@ class AirshipClient
   end
 
   def identify(objs)
-    response = @conn.post do |req|
-      req.url(V1_IDENTIFY_ENDPOINT)
-      req.headers["Content-Type"] = "application/json"
-      req.headers["api-key"] = @api_key || @@api_key
-      req.options.timeout = @@timeout
-      request_obj = {}
-      request_obj["env_key"] = @env_key || @@env_key
-      request_obj["objects"] = objs
-      req.body = request_obj.to_json
+    begin
+      response = @conn.post do |req|
+        req.url(V1_IDENTIFY_ENDPOINT)
+        req.headers["Content-Type"] = "application/json"
+        req.headers["api-key"] = @api_key || @@api_key
+        req.options.timeout = @@timeout
+        request_obj = {}
+        request_obj["env_key"] = @env_key || @@env_key
+        request_obj["objects"] = objs
+        req.body = request_obj.to_json
+      end
+    rescue Faraday::TimeoutError => e
+
     end
   end
 
   def gate(control_name, obj)
-    response = @conn.post do |req|
-      req.url(V1_GATE_ENDPOINT)
-      req.headers["Content-Type"] = "application/json"
-      req.headers["api-key"] = @api_key || @@api_key
-      req.options.timeout = @@timeout
-      request_obj = {}
-      request_obj["env_key"] = @env_key || @@env_key
-      request_obj["control_short_name"] = control_name
-      request_obj["object"] = obj
-      req.body = request_obj.to_json
+    begin
+      response = @conn.post do |req|
+        req.url(V1_GATE_ENDPOINT)
+        req.headers["Content-Type"] = "application/json"
+        req.headers["api-key"] = @api_key || @@api_key
+        req.options.timeout = @@timeout
+        request_obj = {}
+        request_obj["env_key"] = @env_key || @@env_key
+        request_obj["control_short_name"] = control_name
+        request_obj["object"] = obj
+        req.body = request_obj.to_json
+      end
+    rescue Faraday::TimeoutError => e
+
     end
   end
 
