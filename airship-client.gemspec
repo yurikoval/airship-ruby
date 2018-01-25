@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "Ruby SDK"
   s.authors     = ["Airship Dev Team"]
   s.email       = "hello@airshiphq.com"
-  s.files       = ["lib/airship.rb"]
+  s.files       = ["lib/airship-client.rb"]
   s.homepage    = "https://airshiphq.com"
   s.metadata    = { "source_code_uri" => "https://github.com/airshiphq/airship-ruby" }
   s.add_runtime_dependency "faraday", ">= 0.14.0"
