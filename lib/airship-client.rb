@@ -131,6 +131,7 @@ class AirshipClient
   end
 
   def gate(control_name, obj)
+    is_array = obj.instance_of?(Array)
     begin
       response = @conn.post do |req|
         req.url(V1_GATE_ENDPOINT)
@@ -140,12 +141,76 @@ class AirshipClient
         request_obj = {}
         request_obj["env_key"] = @env_key || @@env_key
         request_obj["control_short_name"] = control_name
-        request_obj["object"] = obj
+        if is_array
+          request_obj["objects"] = obj
+        else
+          request_obj["object"] = obj
+        end
         req.body = request_obj.to_json
       end
       result = JSON.parse(response.body)
-      if result[SERVER_INFO_KEY] == SERVER_STATE_MAINTENANCE
+      if result.instance_of?(Hash) && result[SERVER_INFO_KEY] == SERVER_STATE_MAINTENANCE
         if @@fail_gracefully
+          if is_array
+            results = []
+            for i in 0...obj.length
+              o = obj[i]
+              results.push(
+                {
+                  "type" => o["type"],
+                  "id" => o["id"],
+                  "display_name" => o["display_name"],
+                  "control" => {
+                    "control_short_name" => control_name,
+                    "value" => false,
+                    "variation" => nil,
+                    "from_server" => false,
+                    "from_cache" => false
+                  }
+                }
+              )
+            end
+            return results
+          else
+            return {
+              "type" => obj["type"],
+              "id" => obj["id"],
+              "display_name" => obj["display_name"],
+              "control" => {
+                "control_short_name" => control_name,
+                "value" => false,
+                "variation" => nil,
+                "from_server" => false,
+                "from_cache" => false
+              }
+            }
+          end
+        end
+      end
+      result
+    rescue Faraday::TimeoutError => e
+      if @@fail_gracefully
+        if is_array
+          results = []
+          for i in 0...obj.length
+            o = obj[i]
+            results.push(
+              {
+                "type" => o["type"],
+                "id" => o["id"],
+                "display_name" => o["display_name"],
+                "control" => {
+                  "control_short_name" => control_name,
+                  "value" => false,
+                  "variation" => nil,
+                  "from_server" => false,
+                  "from_cache" => false
+                }
+              }
+            )
+          end
+          return results
+        else
           return {
             "type" => obj["type"],
             "id" => obj["id"],
@@ -159,22 +224,6 @@ class AirshipClient
             }
           }
         end
-      end
-      result
-    rescue Faraday::TimeoutError => e
-      if @@fail_gracefully
-        return {
-          "type" => obj["type"],
-          "id" => obj["id"],
-          "display_name" => obj["display_name"],
-          "control" => {
-            "control_short_name" => control_name,
-            "value" => false,
-            "variation" => nil,
-            "from_server" => false,
-            "from_cache" => false
-          }
-        }
       else
         raise
       end
