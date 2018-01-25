@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = "airship-client"
-  s.version     = "0.1.0"
+  s.version     = "0.1.1"
   s.licenses    = ["MIT"]
   s.summary     = "A light Ruby SDK to access Airship"
-  s.description = "Ruby SDK 0.1.0"
+  s.description = "Ruby SDK"
   s.authors     = ["Airship Dev Team"]
   s.email       = "hello@airshiphq.com"
   s.files       = ["lib/airship.rb"]
