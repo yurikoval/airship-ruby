@@ -25,7 +25,7 @@ client = AirshipClient.new(nil, "vuvl5bn7btteq8vl")
 # 1. identify(<obj>|[<obj>, ...])
 #    - For individual or bulk data ingestion
 # 2. gate(<control_short_name>, <obj>)
-#    - Querying for a single object's while ingesting at the same time
+#    - Querying for a single object's control information while ingesting at the same time
 # 3. get_value
 #    - Convenience method for getting the boolean value
 # 4. get_variation
