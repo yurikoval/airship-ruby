@@ -15,6 +15,7 @@ client.get_variation("<control_name>", <obj>) -> [nil, "<variation1>", "<variati
 client.identify([<obj>, ...])                 -> dictionary
 client.gate(<obj>)                            -> dictionary
 =end
+
 API_BASE_ENDPOINT = "https://api.airshiphq.com"
 V1_IDENTIFY_ENDPOINT = "/v1/identify"
 V1_GATE_ENDPOINT = "/v1/gate"
@@ -118,6 +119,7 @@ class AirshipClient
         request_obj["objects"] = objs
         req.body = request_obj.to_json
       end
+      JSON.parse(response.body)
     rescue Faraday::TimeoutError => e
       raise
     end
@@ -136,6 +138,7 @@ class AirshipClient
         request_obj["object"] = obj
         req.body = request_obj.to_json
       end
+      JSON.parse(response.body)
     rescue Faraday::TimeoutError => e
       if @@fail_gracefully
         return {
@@ -157,10 +160,12 @@ class AirshipClient
   end
 
   def get_value(control_name, obj)
-
+    result = self.gate(control_name, obj)
+    result["control"]["value"]
   end
 
   def get_variation(control_name, obj)
-
+    result = self.gate(control_name, obj)
+    result["control"]["variation"]
   end
 end
