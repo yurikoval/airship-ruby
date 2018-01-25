@@ -108,6 +108,9 @@ class AirshipClient
   end
 
   def identify(objs)
+    if !objs.instance_of?(Array)
+      objs = [objs]
+    end
     begin
       response = @conn.post do |req|
         req.url(V1_IDENTIFY_ENDPOINT)
