@@ -1,4 +1,6 @@
-require "rest-client"
+require "faraday"
+require "json"
+
 =begin
 AirshipClient.init("r9b72kqdh1wbzkpkf7gntwfapqoc26bl", "nxmqp35umrd3djth")
 AirshipClient.set_env_key("c1087mh6a3hjxiaz")
@@ -13,9 +15,9 @@ client.get_variation("<control_name>", <obj>) -> [nil, "<variation1>", "<variati
 client.identify([<obj>, ...])                 -> dictionary
 client.gate(<obj>)                            -> dictionary
 =end
-
-V1_IDENTIFY_ENDPOINT = "https://api.airshiphq.com/v1/identify"
-V1_GATE_ENDPOINT = "https://api.airshiphq.com/v1/gate"
+API_BASE_ENDPOINT = "https://api.airshiphq.com"
+V1_IDENTIFY_ENDPOINT = "/v1/identify"
+V1_GATE_ENDPOINT = "/v1/gate"
 
 DEFAULT_TIMEOUT = 2
 
@@ -30,6 +32,7 @@ class AirshipClient
 
   @api_key = nil
   @env_key = nil
+  @conn = nil
 
   class << self
     def init(api_key, env_key = nil, timeout = DEFAULT_TIMEOUT, fail_gracefully = true)
@@ -99,15 +102,35 @@ class AirshipClient
 
     @api_key = api_key
     @env_key = env_key
+    @conn = Faraday.new(:url => API_BASE_ENDPOINT)
     nil
   end
 
-  def identify(control_name, obj)
-
+  def identify(objs)
+    response = @conn.post do |req|
+      req.url(V1_IDENTIFY_ENDPOINT)
+      req.headers["Content-Type"] = "application/json"
+      req.headers["api-key"] = @api_key || @@api_key
+      req.options.timeout = @@timeout
+      request_obj = {}
+      request_obj["env_key"] = @env_key || @@env_key
+      request_obj["objects"] = objs
+      req.body = request_obj.to_json
+    end
   end
 
   def gate(control_name, obj)
-
+    response = @conn.post do |req|
+      req.url(V1_GATE_ENDPOINT)
+      req.headers["Content-Type"] = "application/json"
+      req.headers["api-key"] = @api_key || @@api_key
+      req.options.timeout = @@timeout
+      request_obj = {}
+      request_obj["env_key"] = @env_key || @@env_key
+      request_obj["control_short_name"] = control_name
+      request_obj["object"] = obj
+      req.body = request_obj.to_json
+    end
   end
 
   def get_value(control_name, obj)
