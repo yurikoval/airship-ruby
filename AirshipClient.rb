@@ -1,23 +1,25 @@
 require "rest-client"
 =begin
-AirshipClient.init('r9b72kqdh1wbzkpkf7gntwfapqoc26bl', 'nxmqp35umrd3djth')
-AirshipClient.set_env_key('c1087mh6a3hjxiaz')
+AirshipClient.init("r9b72kqdh1wbzkpkf7gntwfapqoc26bl", "nxmqp35umrd3djth")
+AirshipClient.set_env_key("c1087mh6a3hjxiaz")
 client = AirshipClient.new
-client = AirshipClient.new('nxmqp35umrd3djth')
-client = AirshipClient.new('c1087mh6a3hjxiaz')
+client = AirshipClient.new("nxmqp35umrd3djth")
+client = AirshipClient.new("c1087mh6a3hjxiaz")
 
 1. Error checking for the keys
 2. identify and gate endpoint
-client.get_value('<control_name>', <obj>)     -> [false, true]
-client.get_variation('<control_name>', <obj>) -> [nil, '<variation1>', '<variation2'>, ...]
+client.get_value("<control_name>", <obj>)     -> [false, true]
+client.get_variation("<control_name>", <obj>) -> [nil, "<variation1>", "<variation2">, ...]
 client.identify([<obj>, ...])                 -> dictionary
 client.gate(<obj>)                            -> dictionary
 =end
 
-V1_IDENTIFY_ENDPOINT = 'https://api.airshiphq.com/v1/identify'
-V1_GATE_ENDPOINT = 'https://api.airshiphq.com/v1/gate'
+V1_IDENTIFY_ENDPOINT = "https://api.airshiphq.com/v1/identify"
+V1_GATE_ENDPOINT = "https://api.airshiphq.com/v1/gate"
 
 DEFAULT_TIMEOUT = 2
+
+SERVER_INFO_KEY = "server_info"
 
 
 class AirshipClient
