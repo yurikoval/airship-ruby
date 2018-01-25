@@ -23,6 +23,7 @@ V1_GATE_ENDPOINT = "/v1/gate"
 DEFAULT_TIMEOUT = 2
 
 SERVER_INFO_KEY = "server_info"
+SERVER_STATE_MAINTENANCE = "maintenance"
 
 
 class AirshipClient
@@ -108,6 +109,9 @@ class AirshipClient
   end
 
   def identify(objs)
+    if !objs.instance_of?(Array)
+      objs = [objs]
+    end
     begin
       response = @conn.post do |req|
         req.url(V1_IDENTIFY_ENDPOINT)
@@ -119,7 +123,8 @@ class AirshipClient
         request_obj["objects"] = objs
         req.body = request_obj.to_json
       end
-      JSON.parse(response.body)
+      result = JSON.parse(response.body)
+      result
     rescue Faraday::TimeoutError => e
       raise
     end
@@ -138,7 +143,24 @@ class AirshipClient
         request_obj["object"] = obj
         req.body = request_obj.to_json
       end
-      JSON.parse(response.body)
+      result = JSON.parse(response.body)
+      if result[SERVER_INFO_KEY] == SERVER_STATE_MAINTENANCE
+        if @@fail_gracefully
+          return {
+            "type" => obj["type"],
+            "id" => obj["id"],
+            "display_name" => obj["display_name"],
+            "control" => {
+              "control_short_name" => control_name,
+              "value" => false,
+              "variation" => nil,
+              "from_server" => false,
+              "from_cache" => false
+            }
+          }
+        end
+      end
+      result
     rescue Faraday::TimeoutError => e
       if @@fail_gracefully
         return {
