@@ -34,7 +34,7 @@ client = AirshipClient.new(nil, "vuvl5bn7btteq8vl")
 
 object = {
   "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar"
-  "id" => "1234",
+  "id" => "1234", # "id" must be a string, so if you wish to pass an integer, simply convert via .to_s
   "display_name" => "ironman@stark.com"
 }
 
