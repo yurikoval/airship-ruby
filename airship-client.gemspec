@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.files       = ["lib/airship-client.rb"]
   s.homepage    = "https://airshiphq.com"
   s.metadata    = { "source_code_uri" => "https://github.com/airshiphq/airship-ruby" }
-  s.add_runtime_dependency "faraday", ">= 0.9"
+  s.add_runtime_dependency "faraday", ">= 0.9.0"
   s.add_runtime_dependency "json", ">= 1.7.7"
 end
