@@ -65,3 +65,21 @@ AirshipClient.init(<api_key>, <env_key>, <timeout>, <fail_gracefully>)
 ```
 
 Above, `<timeout>` is the number of seconds the SDK waits for a network call before timing out and failing gracefully. The default value is 2 seconds.
+
+Note: if a gate call to the server is successful, the `from_server` field will be missing.
+
+## Base population eligibility
+The `eligible` flag indicates whether an object is part of the base population.
+```ruby
+{
+    ...
+    "control" => {
+        "value" => false,
+        "variation" => nil,
+        "eligible" => true
+    }
+    ...
+}
+```
+
+Note: if a gate call to the server fails, the `eligible` field will be missing.
