@@ -44,3 +44,24 @@ client.gate("bitcoin-pay", object)
 client.get_value("bitcoin-pay", object)
 client.get_variation("bitcoin-pay", object)
 ```
+
+## Graceful failure
+When graceful failure mode is enabled (which is the default), if a call to Airship's server fails or times out, the SDK will return the following values:
+```ruby
+{
+    ...
+    "control" => {
+        "value" => false,
+        "variation" => nil,
+        "from_server" => false
+    }
+    ...
+}
+```
+
+You can turn off graceful failure during initialization:
+```ruby
+AirshipClient.init(<api_key>, <env_key>, <timeout>, <fail_gracefully>)
+```
+
+Above, `<timeout>` is the number of seconds the SDK waits for a network call before timing out and failing gracefully. The default value is 2 seconds.
