@@ -46,7 +46,7 @@ client.get_variation("bitcoin-pay", object)
 ```
 
 ## Graceful failure
-When graceful failure mode is enabled (which is the default), if a gate call to Airship's server fails or times out, the SDK will return the following values:
+When graceful failure mode is enabled (which is the default), if a gate call to Airship's server fails or times out, the SDK will return the following value:
 ```ruby
 {
     ...
