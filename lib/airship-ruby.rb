@@ -20,8 +20,6 @@ class Airship
     @gateStatsBatch = []
 
     @gateStatsBatchLock = Concurrent::Semaphore.new(1)
-    @gateStatsWatcherLock = Concurrent::Semaphore.new(1)
-    @gateStatsUploaderTasksLock = Concurrent::Semaphore.new(1)
   end
 
   def init
@@ -56,11 +54,24 @@ class Airship
     end
   end
 
+  def _createProcessor(batch)
+
+  end
+
   def _processBatch(limit)
     processed = false
     @gateStatsBatchLock.acquire
     if @gateStatsBatch.size > limit
-      # TODO: do actual processing
+      newGateStatsUploaderTasks = []
+      @gateStatsUploaderTasks.each do |task|
+        if !task.fulfilled?
+          newGateStatsUploaderTasks.push(task)
+        end
+      end
+      oldBatch = @gateStatsBatch
+      @gateStatsBatch = []
+      newGateStatsUploaderTasks.push(self._createProcessor(oldBatch))
+      @gateStatsUploaderTasks = newGateStatsUploaderTasks
       processed = true
     end
     @gateStatsBatchLock.release
