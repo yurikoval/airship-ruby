@@ -55,7 +55,9 @@ class Airship
   end
 
   def _createProcessor(batch)
-
+    return Concurrent::ScheduledTask.execute(0) do |task|
+      # TODO: use Faraday to upload
+    end
   end
 
   def _processBatch(limit)
