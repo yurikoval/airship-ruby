@@ -12,4 +12,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "faraday", ">= 0.9.0"
   s.add_runtime_dependency "json", ">= 1.7.7"
   s.add_runtime_dependency "concurrent-ruby", ">= 1.0.5"
+  s.add_runtime_dependency "public_suffix", "~> 2.0"
+  s.add_runtime_dependency "json-schema", "~> 2.8"
 end
