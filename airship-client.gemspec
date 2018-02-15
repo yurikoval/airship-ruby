@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "airship-ruby"
-  s.version     = "1.0.0"
+  s.version     = "0.1.0"
   s.licenses    = ["MIT"]
   s.summary     = "Airship Ruby SDK"
   s.description = "Ruby SDK"
