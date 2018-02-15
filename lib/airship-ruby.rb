@@ -88,7 +88,7 @@ class Airship
     end
   end
 
-  def uploadStatsAsync(stats)
+  def _uploadStatsAsync(stats)
     @gateStatsBatchLock.acquire
     @gateStatsBatch.push(stats)
     @gateStatsBatchLock.release
