@@ -11,4 +11,5 @@ Gem::Specification.new do |s|
   s.metadata    = { "source_code_uri" => "https://github.com/airshiphq/airship-ruby" }
   s.add_runtime_dependency "faraday", ">= 0.9.0"
   s.add_runtime_dependency "json", ">= 1.7.7"
+  s.add_runtime_dependency "concurrent-ruby", ">= 1.0.5"
 end
