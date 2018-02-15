@@ -5,23 +5,41 @@ require 'concurrent'
 class Airship
   def initialize(options)
     @gatingInfo = nil
-    @gatingInfoTask = nil
+    @gatingInfoDownloaderTask = nil
 
     @gatingInfoMap = nil
 
     @maxGateStatsBatchSize = 500
     @gateStatsUploadBatchInterval = 60
 
-    @gateStatsUploadTask = nil
+    @gateStatsWatcher = nil
+
+    @gateStatsUploaderTasks = []
+
     @gateStatsBatch = []
 
-    @semaphore = Concurrent::Semaphore.new(1)
+    @initLock = Concurrent::Semaphore.new(1)
+    @gateStatsWatcherLock = Concurrent::Semaphore.new(1)
+    @gateStatsUploaderTasksLock = Concurrent::Semaphore.new(1)
   end
 
   def init()
-    @gateInfoTask = Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
+    @initLock.acquire
 
+    if @gatingInfoDownloaderTask.nil?
+      @gatingInfoDownloaderTask = Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
+        puts "Pulling data from server\n"
+      end
+      @gatingInfoDownloaderTask.execute
     end
-    @gateInfoTask.execute
+
+    if @gateStatsWatcher.nil?
+      @gateStatsWatcher = Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
+        puts "Uploading data to server\n"
+      end
+      @gateStatsWatcher.execute
+    end
+
+    @initLock.release
   end
 end
