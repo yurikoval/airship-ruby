@@ -40,7 +40,7 @@ class Airship
 
   def _createPoller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
-      puts "Pulling data from server\n"
+      # TODO: use Faraday to pull info
     end
   end
 
