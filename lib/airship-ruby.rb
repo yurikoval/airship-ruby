@@ -95,4 +95,16 @@ class Airship
 
     self._checkBatchSizeAndMaybeProcess
   end
+
+  def enabled?(controlShortName, object)
+    false
+  end
+
+  def variation(controlShortName, object)
+    nil
+  end
+
+  def eligible?(controlShortName, object)
+    false
+  end
 end
