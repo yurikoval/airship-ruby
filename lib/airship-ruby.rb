@@ -1,5 +1,6 @@
 require 'faraday'
 require 'json'
+require 'concurrent'
 
 class Airship
   def initialize(options)
@@ -13,5 +14,11 @@ class Airship
 
     @gateStatsUploadThread = nil
     @gateStatsBatch = []
+
+    @semaphore = Concurrent::Semaphore.new(1)
+  end
+
+  def init()
+
   end
 end
