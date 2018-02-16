@@ -1,6 +1,7 @@
 require 'faraday'
 require 'json'
 require 'concurrent'
+require 'digest'
 
 SCHEMA = {
   "type" => "object",
@@ -100,7 +101,7 @@ SCHEMA = {
 class Airship
   class << self
     def get_hashed_value(s)
-
+      Digest::MD5.hexdigest(s).to_i(base=16).fdiv(340282366920938463463374607431768211455)
     end
   end
 
