@@ -10,7 +10,7 @@ SCHEMA = {
       "pattern" => "^([A-Z][a-zA-Z]*)+$",
       "maxLength" => 50,
     },
-    "isGroup" => {
+    "is_group" => {
       "type" => "boolean",
     },
     "id" => {
@@ -18,7 +18,7 @@ SCHEMA = {
       "maxLength" => 250,
       "minLength" => 1,
     },
-    "displayName" => {
+    "display_name" => {
       "type" => "string",
       "maxLength" => 250,
       "minLength" => 1,
@@ -52,7 +52,7 @@ SCHEMA = {
           "pattern" => "^([A-Z][a-zA-Z]*)+$",
           "maxLength" => 50,
         },
-        "isGroup" => {
+        "is_group" => {
           "type" => "boolean",
           "enum" => [true],
         },
@@ -61,7 +61,7 @@ SCHEMA = {
           "maxLength" => 250,
           "minLength" => 1,
         },
-        "displayName" => {
+        "display_name" => {
           "type" => "string",
           "maxLength" => 250,
           "minLength" => 1,
