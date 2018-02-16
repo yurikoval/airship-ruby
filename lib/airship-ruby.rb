@@ -100,7 +100,7 @@ class Airship
     "additionalProperties" => false,
   }
 
-  SERVER_URL = 'http://localhost:8000'
+  SERVER_URL = 'https://api.airshiphq.com'
   IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
   GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
   PLATFORM = 'ruby'
@@ -195,7 +195,40 @@ class Airship
   end
 
   def _get_gating_info_map(gating_info)
+    map = {}
 
+    controls = gating_info['controls']
+
+    controls.forEach do |control|
+      control_info = {}
+
+      control_info['id'] = control['id']
+      control_info['is_on'] = control['is_on']
+      control_info['rule_based_distribution_default_variation'] = control['rule_based_distribution_default_variation']
+      control_info['rule_sets'] = control['rule_sets']
+      control_info['distributions'] = control['distributions']
+      control_info['type'] = control['type']
+      control_info['default_variation'] = control['default_variation']
+
+      enablements = control['enablements']
+      enablements_info = {}
+
+      enablements.forEach do |enablement|
+        client_identities_map = enablements_info[enablement['client_object_type_name']]
+
+        if client_identities_map.nil?
+          enablements_info[enablement['client_object_type_name']] = {}
+        end
+
+        enablements_info[enablement['client_object_type_name']][enablement['client_object_identity']] = [enablement['is_enabled'], enablement['variation']]
+      end
+
+      control_info['enablements_info'] = enablements_info
+
+      map[control['short_name']] = control_info
+    end
+
+    return map
   end
 
   def _create_poller
