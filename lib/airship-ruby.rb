@@ -96,7 +96,14 @@ SCHEMA = {
   "additionalProperties" => false,
 }
 
+
 class Airship
+  class << self
+    def get_hashed_value(s)
+
+    end
+  end
+
   def initialize(options)
     @gating_info = nil
     @gating_info_downloader_task = nil
