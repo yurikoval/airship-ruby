@@ -91,11 +91,11 @@ class Airship
             "additionalProperties" => false,
           },
         },
-        "required" => ["id", "displayName"],
+        "required" => ["id", "display_name"],
         "additionalProperties" => false,
       },
     },
-    "required" => ["type", "id", "displayName"],
+    "required" => ["type", "id", "display_name"],
     "additionalProperties" => false,
   }
 
