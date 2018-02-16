@@ -196,7 +196,6 @@ class Airship
 
   def _create_poller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
-      puts 'polling'
       conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
       response = conn.get do |req|
         req.options.timeout = 10
