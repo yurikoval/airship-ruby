@@ -199,7 +199,7 @@ class Airship
 
     controls = gating_info['controls']
 
-    controls.forEach do |control|
+    controls.each do |control|
       control_info = {}
 
       control_info['id'] = control['id']
@@ -213,7 +213,7 @@ class Airship
       enablements = control['enablements']
       enablements_info = {}
 
-      enablements.forEach do |enablement|
+      enablements.each do |enablement|
         client_identities_map = enablements_info[enablement['client_object_type_name']]
 
         if client_identities_map.nil?
@@ -228,7 +228,7 @@ class Airship
       map[control['short_name']] = control_info
     end
 
-    return map
+    map
   end
 
   def _create_poller
