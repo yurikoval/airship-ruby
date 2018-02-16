@@ -2,6 +2,7 @@ require 'faraday'
 require 'json'
 require 'concurrent'
 require 'digest'
+require 'rubygems'
 
 
 class Airship
@@ -98,6 +99,40 @@ class Airship
     "required" => ["type", "id", "display_name"],
     "additionalProperties" => false,
   }
+
+  SERVER_URL = 'https://api.airshiphq.com'
+  IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
+  GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
+  PLATFORM = 'ruby'
+  VERSION = Gem::Specification::load(File.join(File.dirname(File.dirname(File.expand_path(__FILE__))), 'airship-ruby.gemspec')).version.to_s
+
+  SDK_VERSION = "#{PLATFORM}:#{VERSION}"
+
+  CONTROL_TYPE_BOOLEAN = 'boolean'
+  CONTROL_TYPE_MULTIVARIATE = 'multivariate'
+
+  DISTRIBUTION_TYPE_RULE_BASED = 'R'
+  DISTRIBUTION_TYPE_PERCENTAGE_BASED = 'P'
+
+  OBJECT_ATTRIBUTE_TYPE_STRING = 'STRING'
+  OBJECT_ATTRIBUTE_TYPE_INT = 'INT'
+  OBJECT_ATTRIBUTE_TYPE_FLOAT = 'FLOAT'
+  OBJECT_ATTRIBUTE_TYPE_BOOLEAN = 'BOOLEAN'
+  OBJECT_ATTRIBUTE_TYPE_DATE = 'DATE'
+  OBJECT_ATTRIBUTE_TYPE_DATETIME = 'DATETIME'
+
+  RULE_OPERATOR_TYPE_IS = 'IS'
+  RULE_OPERATOR_TYPE_IS_NOT = 'IS_NOT'
+  RULE_OPERATOR_TYPE_IN = 'IN'
+  RULE_OPERATOR_TYPE_NOT_IN = 'NOT_IN'
+  RULE_OPERATOR_TYPE_LT = 'LT'
+  RULE_OPERATOR_TYPE_LTE = 'LTE'
+  RULE_OPERATOR_TYPE_GT = 'GT'
+  RULE_OPERATOR_TYPE_GTE = 'GTE'
+  RULE_OPERATOR_TYPE_FROM = 'FROM'
+  RULE_OPERATOR_TYPE_UNTIL = 'UNTIL'
+  RULE_OPERATOR_TYPE_AFTER = 'AFTER'
+  RULE_OPERATOR_TYPE_BEFORE = 'BEFORE'
 
   class << self
     def get_hashed_value(s)
