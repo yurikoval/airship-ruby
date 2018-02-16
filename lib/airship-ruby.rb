@@ -104,7 +104,16 @@ class Airship
   IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
   GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
   PLATFORM = 'ruby'
-  VERSION = Gem::Specification::load(File.join(File.dirname(File.dirname(File.expand_path(__FILE__))), 'airship-ruby.gemspec')).version.to_s
+  VERSION = Gem::Specification::load(
+    File.join(
+      File.dirname(
+        File.dirname(
+          File.expand_path(__FILE__)
+        )
+      ),
+      'airship-ruby.gemspec'
+    )
+  ).version.to_s
 
   SDK_VERSION = "#{PLATFORM}:#{VERSION}"
 
