@@ -2,6 +2,100 @@ require 'faraday'
 require 'json'
 require 'concurrent'
 
+SCHEMA = {
+  "type" => "object",
+  "properties" => {
+    "type" => {
+      "type" => "string",
+      "pattern" => "^([A-Z][a-zA-Z]*)+$",
+      "maxLength" => 50,
+    },
+    "isGroup" => {
+      "type" => "boolean",
+    },
+    "id" => {
+      "type" => "string",
+      "maxLength" => 250,
+      "minLength" => 1,
+    },
+    "displayName" => {
+      "type" => "string",
+      "maxLength" => 250,
+      "minLength" => 1,
+    },
+    "attributes" => {
+      "type" => "object",
+      "patternProperties" => {
+        "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
+          "oneOf" => [
+            {
+              "type" => "string",
+              "maxLength" => 3000,
+            },
+            {
+              "type" => "boolean"
+            },
+            {
+              "type" => "number"
+            },
+          ],
+        },
+      },
+      "maxProperties" => 100,
+      "additionalProperties" => false,
+    },
+    "group" => {
+      "type" => ["object", "null"],
+      "properties" => {
+        "type" => {
+          "type" => "string",
+          "pattern" => "^([A-Z][a-zA-Z]*)+$",
+          "maxLength" => 50,
+        },
+        "isGroup" => {
+          "type" => "boolean",
+          "enum" => [true],
+        },
+        "id" => {
+          "type" => "string",
+          "maxLength" => 250,
+          "minLength" => 1,
+        },
+        "displayName" => {
+          "type" => "string",
+          "maxLength" => 250,
+          "minLength" => 1,
+        },
+        "attributes" => {
+          "type" => "object",
+          "patternProperties" => {
+            "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
+              "oneOf" => [
+                {
+                  "type" => "string",
+                  "maxLength" => 3000,
+                },
+                {
+                  "type" => "boolean"
+                },
+                {
+                  "type" => "number"
+                },
+              ],
+            },
+          },
+          "maxProperties" => 100,
+          "additionalProperties" => false,
+        },
+      },
+      "required" => ["id", "displayName"],
+      "additionalProperties" => false,
+    },
+  },
+  "required" => ["type", "id", "displayName"],
+  "additionalProperties" => false,
+}
+
 class Airship
   def initialize(options)
     @gatingInfo = nil
