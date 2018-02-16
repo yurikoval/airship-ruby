@@ -98,107 +98,107 @@ SCHEMA = {
 
 class Airship
   def initialize(options)
-    @gatingInfo = nil
-    @gatingInfoDownloaderTask = nil
+    @gating_info = nil
+    @gating_info_downloader_task = nil
 
-    @gatingInfoMap = nil
+    @gating_info_map = nil
 
-    @maxGateStatsBatchSize = 500
-    @gateStatsUploadBatchInterval = 60
+    @max_gate_stats_batch_size = 500
+    @gate_stats_upload_batch_interval = 60
 
-    @gateStatsWatcher = nil
-    @gateStatsLastTaskScheduledTimestamp = Concurrent::AtomicFixnum.new(0)
+    @gate_stats_watcher = nil
+    @gate_stats_last_task_scheduled_timestamp = Concurrent::AtomicFixnum.new(0)
 
-    @gateStatsUploaderTasks = []
+    @gate_stats_uploader_tasks = []
 
-    @gateStatsBatch = []
+    @gate_stats_batch = []
 
-    @gateStatsBatchLock = Concurrent::Semaphore.new(1)
+    @gate_stats_batch_lock = Concurrent::Semaphore.new(1)
   end
 
   def init
     # Not thread safe yet
-    if @gatingInfoDownloaderTask.nil?
-      @gatingInfoDownloaderTask = self._createPoller
-      @gatingInfoDownloaderTask.execute
+    if @gating_info_downloader_task.nil?
+      @gating_info_downloader_task = self._create_poller
+      @gating_info_downloader_task.execute
     end
 
-    if @gateStatsWatcher.nil?
-      @gateStatsWatcher = self._createWatcher
-      @gateStatsWatcher.execute
+    if @gate_stats_watcher.nil?
+      @gate_stats_watcher = self._create_watcher
+      @gate_stats_watcher.execute
     end
     # Thread safe after this point
   end
 
-  def _createPoller
+  def _create_poller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
       # TODO: use Faraday to pull info
     end
   end
 
-  def _createWatcher
+  def _create_watcher
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
       now = Time.now.utc.to_i
-      if now - @gateStatsLastTaskScheduledTimestamp.value >= 60
-        processed = self._processBatch(0)
+      if now - @gate_stats_last_task_scheduled_timestamp.value >= 60
+        processed = self._process_batch(0)
         if processed
-          @gateStatsLastTaskScheduledTimestamp.value = now
+          @gate_stats_last_task_scheduled_timestamp.value = now
         end
       end
     end
   end
 
-  def _createProcessor(batch)
+  def _create_processor(batch)
     return Concurrent::ScheduledTask.execute(0) do |task|
       # TODO: use Faraday to upload
     end
   end
 
-  def _processBatch(limit)
+  def _process_batch(limit)
     processed = false
-    @gateStatsBatchLock.acquire
-    if @gateStatsBatch.size > limit
-      newGateStatsUploaderTasks = []
-      @gateStatsUploaderTasks.each do |task|
+    @gate_stats_batch_lock.acquire
+    if @gate_stats_batch.size > limit
+      new_gate_stats_uploader_tasks = []
+      @gate_stats_uploader_tasks.each do |task|
         if !task.fulfilled?
-          newGateStatsUploaderTasks.push(task)
+          new_gate_stats_uploader_tasks.push(task)
         end
       end
-      oldBatch = @gateStatsBatch
-      @gateStatsBatch = []
-      newGateStatsUploaderTasks.push(self._createProcessor(oldBatch))
-      @gateStatsUploaderTasks = newGateStatsUploaderTasks
+      old_batch = @gate_stats_batch
+      @gate_stats_batch = []
+      new_gate_stats_uploader_tasks.push(self._create_processor(old_batch))
+      @gate_stats_uploader_tasks = new_gate_stats_uploader_tasks
       processed = true
     end
-    @gateStatsBatchLock.release
+    @gate_stats_batch_lock.release
     processed
   end
 
-  def _checkBatchSizeAndMaybeProcess
-    processed = self._processBatch(@maxGateStatsBatchSize - 1)
+  def _check_batch_size_and_maybe_process
+    processed = self._process_batch(@max_gate_stats_batch_size - 1)
     if processed
       now = Time.now.utc.to_i
-      @gateStatsLastTaskScheduledTimestamp.value = now
+      @gate_stats_last_task_scheduled_timestamp.value = now
     end
   end
 
-  def _uploadStatsAsync(stats)
-    @gateStatsBatchLock.acquire
-    @gateStatsBatch.push(stats)
-    @gateStatsBatchLock.release
+  def _upload_stats_async(stats)
+    @gate_stats_batch_lock.acquire
+    @gate_stats_batch.push(stats)
+    @gate_stats_batch_lock.release
 
-    self._checkBatchSizeAndMaybeProcess
+    self._check_batch_size_and_maybe_process
   end
 
-  def enabled?(controlShortName, object)
+  def enabled?(control_short_name, object)
     false
   end
 
-  def variation(controlShortName, object)
+  def variation(control_short_name, object)
     nil
   end
 
-  def eligible?(controlShortName, object)
+  def eligible?(control_short_name, object)
     false
   end
 end
