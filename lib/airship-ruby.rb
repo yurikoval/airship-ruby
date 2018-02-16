@@ -3,102 +3,102 @@ require 'json'
 require 'concurrent'
 require 'digest'
 
-SCHEMA = {
-  "type" => "object",
-  "properties" => {
-    "type" => {
-      "type" => "string",
-      "pattern" => "^([A-Z][a-zA-Z]*)+$",
-      "maxLength" => 50,
-    },
-    "is_group" => {
-      "type" => "boolean",
-    },
-    "id" => {
-      "type" => "string",
-      "maxLength" => 250,
-      "minLength" => 1,
-    },
-    "display_name" => {
-      "type" => "string",
-      "maxLength" => 250,
-      "minLength" => 1,
-    },
-    "attributes" => {
-      "type" => "object",
-      "patternProperties" => {
-        "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
-          "oneOf" => [
-            {
-              "type" => "string",
-              "maxLength" => 3000,
-            },
-            {
-              "type" => "boolean"
-            },
-            {
-              "type" => "number"
-            },
-          ],
-        },
-      },
-      "maxProperties" => 100,
-      "additionalProperties" => false,
-    },
-    "group" => {
-      "type" => ["object", "null"],
-      "properties" => {
-        "type" => {
-          "type" => "string",
-          "pattern" => "^([A-Z][a-zA-Z]*)+$",
-          "maxLength" => 50,
-        },
-        "is_group" => {
-          "type" => "boolean",
-          "enum" => [true],
-        },
-        "id" => {
-          "type" => "string",
-          "maxLength" => 250,
-          "minLength" => 1,
-        },
-        "display_name" => {
-          "type" => "string",
-          "maxLength" => 250,
-          "minLength" => 1,
-        },
-        "attributes" => {
-          "type" => "object",
-          "patternProperties" => {
-            "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
-              "oneOf" => [
-                {
-                  "type" => "string",
-                  "maxLength" => 3000,
-                },
-                {
-                  "type" => "boolean"
-                },
-                {
-                  "type" => "number"
-                },
-              ],
-            },
-          },
-          "maxProperties" => 100,
-          "additionalProperties" => false,
-        },
-      },
-      "required" => ["id", "displayName"],
-      "additionalProperties" => false,
-    },
-  },
-  "required" => ["type", "id", "displayName"],
-  "additionalProperties" => false,
-}
-
 
 class Airship
+  SCHEMA = {
+    "type" => "object",
+    "properties" => {
+      "type" => {
+        "type" => "string",
+        "pattern" => "^([A-Z][a-zA-Z]*)+$",
+        "maxLength" => 50,
+      },
+      "is_group" => {
+        "type" => "boolean",
+      },
+      "id" => {
+        "type" => "string",
+        "maxLength" => 250,
+        "minLength" => 1,
+      },
+      "display_name" => {
+        "type" => "string",
+        "maxLength" => 250,
+        "minLength" => 1,
+      },
+      "attributes" => {
+        "type" => "object",
+        "patternProperties" => {
+          "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
+            "oneOf" => [
+              {
+                "type" => "string",
+                "maxLength" => 3000,
+              },
+              {
+                "type" => "boolean"
+              },
+              {
+                "type" => "number"
+              },
+            ],
+          },
+        },
+        "maxProperties" => 100,
+        "additionalProperties" => false,
+      },
+      "group" => {
+        "type" => ["object", "null"],
+        "properties" => {
+          "type" => {
+            "type" => "string",
+            "pattern" => "^([A-Z][a-zA-Z]*)+$",
+            "maxLength" => 50,
+          },
+          "is_group" => {
+            "type" => "boolean",
+            "enum" => [true],
+          },
+          "id" => {
+            "type" => "string",
+            "maxLength" => 250,
+            "minLength" => 1,
+          },
+          "display_name" => {
+            "type" => "string",
+            "maxLength" => 250,
+            "minLength" => 1,
+          },
+          "attributes" => {
+            "type" => "object",
+            "patternProperties" => {
+              "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$" => {
+                "oneOf" => [
+                  {
+                    "type" => "string",
+                    "maxLength" => 3000,
+                  },
+                  {
+                    "type" => "boolean"
+                  },
+                  {
+                    "type" => "number"
+                  },
+                ],
+              },
+            },
+            "maxProperties" => 100,
+            "additionalProperties" => false,
+          },
+        },
+        "required" => ["id", "displayName"],
+        "additionalProperties" => false,
+      },
+    },
+    "required" => ["type", "id", "displayName"],
+    "additionalProperties" => false,
+  }
+
   class << self
     def get_hashed_value(s)
       Digest::MD5.hexdigest(s).to_i(base=16).fdiv(340282366920938463463374607431768211455)
