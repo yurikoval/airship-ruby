@@ -194,6 +194,10 @@ class Airship
     # Thread safe after this point
   end
 
+  def _get_gating_info_map(gating_info)
+
+  end
+
   def _create_poller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
       conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
@@ -202,7 +206,10 @@ class Airship
         req.headers['api-key'] = @api_key
       end
       if response.status == 200
-        info = JSON.parse(response.body)
+        gating_info = JSON.parse(response.body)
+        gating_info_map = self._get_gating_info_map(gating_info)
+        @gating_info = gating_info
+        @gating_info_map = gating_info_map
       end
     end
   end
