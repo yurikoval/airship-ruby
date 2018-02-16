@@ -106,6 +106,18 @@ class Airship
   end
 
   def initialize(options)
+
+    @api_key = options[:api_key]
+    @env_key = options[:env_key]
+
+    if @api_key.nil?
+      raise Exception.new('Missing api_key')
+    end
+
+    if @env_key.nil?
+      raise Exception.new('Missing env_key')
+    end
+
     @gating_info = nil
     @gating_info_downloader_task = nil
 
