@@ -100,7 +100,7 @@ class Airship
     "additionalProperties" => false,
   }
 
-  SERVER_URL = 'https://api.airshiphq.com'
+  SERVER_URL = 'http://localhost:8000'
   IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
   GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
   PLATFORM = 'ruby'
@@ -196,7 +196,15 @@ class Airship
 
   def _create_poller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
-      # TODO: use Faraday to pull info
+      puts 'polling'
+      conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
+      response = conn.get do |req|
+        req.options.timeout = 10
+        req.headers['api-key'] = @api_key
+      end
+      if response.status == 200
+        info = JSON.parse(response.body)
+      end
     end
   end
 
