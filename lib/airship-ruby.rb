@@ -297,9 +297,9 @@ class Airship
     end
   end
 
-  def _upload_stats_async(stats)
+  def _upload_stats_async(gate_stats)
     @gate_stats_batch_lock.acquire
-    @gate_stats_batch.push(stats)
+    @gate_stats_batch.push(gate_stats)
     @gate_stats_batch_lock.release
 
     self._check_batch_size_and_maybe_process
