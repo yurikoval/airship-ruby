@@ -726,10 +726,16 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats'] != false
+
     finish = Time.now
 
-    if (_should_send_stats)
+    if _should_send_stats
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
@@ -772,10 +778,16 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats'] != false
+
     finish = Time.now
 
-    if (_should_send_stats)
+    if _should_send_stats
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
@@ -818,10 +830,16 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats'] != false
+
     finish = Time.now
 
-    if (_should_send_stats)
+    if _should_send_stats
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
