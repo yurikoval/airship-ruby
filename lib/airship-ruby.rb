@@ -3,6 +3,7 @@ require 'json'
 require 'concurrent'
 require 'digest'
 require 'rubygems'
+require 'json-schema'
 
 
 class Airship
@@ -100,7 +101,7 @@ class Airship
     "additionalProperties" => false,
   }
 
-  SERVER_URL = 'https://api.airshiphq.com'
+  SERVER_URL = 'http://localhost:8000'
   IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
   GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
   PLATFORM = 'ruby'
@@ -302,14 +303,38 @@ class Airship
   end
 
   def enabled?(control_short_name, object)
-    false
+    if @gating_info_map.nil?
+      return false
+    end
+
+    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return false
+    end
   end
 
   def variation(control_short_name, object)
-    nil
+    if @gating_info_map.nil?
+      return nil
+    end
+
+    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return nil
+    end
   end
 
   def eligible?(control_short_name, object)
-    false
+    if @gating_info_map.nil?
+      return false
+    end
+
+    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return false
+    end
   end
 end
