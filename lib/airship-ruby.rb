@@ -461,9 +461,9 @@ class Airship
   end
 
   def _get_gate_values_for_object(control_info, object)
-    if !control_info['enablements_info'][object.type].nil?
-      if !control_info['enablements_info'][object.type][object.id].nil?
-        is_enabled, variation = control_info['enablements_info'][object.type][object.id]
+    if !control_info['enablements_info'][object['type']].nil?
+      if !control_info['enablements_info'][object['type']][object['id']].nil?
+        is_enabled, variation = control_info['enablements_info'][object['type']][object['id']]
         return {
           'is_enabled' => is_enabled,
           'variation' => variation,
@@ -491,7 +491,7 @@ class Airship
       end
 
       if satisfies_all_rules
-        hash_key = "SAMPLING:control_#{control_info.id}:env_#{@gating_info['env']['id']}:rule_set_#{rule_set['id']}:client_object_#{object['type']}_#{object['id']}"
+        hash_key = "SAMPLING:control_#{control_info['id']}:env_#{@gating_info['env']['id']}:rule_set_#{rule_set['id']}:client_object_#{object['type']}_#{object['id']}"
         if Airship.get_hashed_value(hash_key) <= rule_set['sampling_percentage']
           sampled_inside_base_population = true
         end
