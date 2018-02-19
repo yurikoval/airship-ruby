@@ -356,18 +356,16 @@ class Airship
     finish = Time.now
 
     if (_should_send_stats)
-      sdk_gate_control_short_name = control_short_name
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
-      sdk_id = @@sdk_id
 
       stats = {}
-      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
       stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = sdk_id
+      stats['sdk_id'] = @@sdk_id
 
       object['stats'] = stats
 
@@ -404,18 +402,16 @@ class Airship
     finish = Time.now
 
     if (_should_send_stats)
-      sdk_gate_control_short_name = control_short_name
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
-      sdk_id = @@sdk_id
 
       stats = {}
-      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
       stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = sdk_id
+      stats['sdk_id'] = @@sdk_id
 
       object['stats'] = stats
 
@@ -452,18 +448,16 @@ class Airship
     finish = Time.now
 
     if (_should_send_stats)
-      sdk_gate_control_short_name = control_short_name
       sdk_gate_timestamp = gate_timestamp
       sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
       sdk_version = SDK_VERSION
-      sdk_id = @@sdk_id
 
       stats = {}
-      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
       stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = sdk_id
+      stats['sdk_id'] = @@sdk_id
 
       object['stats'] = stats
 
