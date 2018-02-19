@@ -319,74 +319,74 @@ class Airship
 
     attribute_val = object['attributes'][attribute_name]
 
-    if attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_STRING
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+    if attribute_type == OBJECT_ATTRIBUTE_TYPE_STRING
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+      elsif operator == RULE_OPERATOR_TYPE_IN
         return !value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+      elsif operator == RULE_OPERATOR_TYPE_NOT_IN
         return value_list.index(attribute_val).nil?
       else
         return false
       end
-    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_INT
+    elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_INT
       value = value && value.to_i
       value_list = value_list && value_list.map { |v| v.to_i }
 
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+      elsif operator == RULE_OPERATOR_TYPE_IN
         return !value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+      elsif operator == RULE_OPERATOR_TYPE_NOT_IN
         return value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_LT
+      elsif operator == RULE_OPERATOR_TYPE_LT
         return attribute_val < value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_LTE
+      elsif operator == RULE_OPERATOR_TYPE_LTE
         return attribute_val <= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_GT
+      elsif operator == RULE_OPERATOR_TYPE_GT
         return attribute_val > value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_GTE
+      elsif operator == RULE_OPERATOR_TYPE_GTE
         return attribute_val >= value
       else
         return false
       end
-    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_FLOAT
+    elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_FLOAT
       value = value && value.to_f
       value_list = value_list && value_list.map { |v| v.to_f }
 
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+      elsif operator == RULE_OPERATOR_TYPE_IN
         return !value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+      elsif operator == RULE_OPERATOR_TYPE_NOT_IN
         return value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_LT
+      elsif operator == RULE_OPERATOR_TYPE_LT
         return attribute_val < value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_LTE
+      elsif operator == RULE_OPERATOR_TYPE_LTE
         return attribute_val <= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_GT
+      elsif operator == RULE_OPERATOR_TYPE_GT
         return attribute_val > value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_GTE
+      elsif operator == RULE_OPERATOR_TYPE_GTE
         return attribute_val >= value
       else
         return false
       end
-    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_BOOLEAN
+    elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_BOOLEAN
       value = (value == 'true') ? true : false
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
       else
         return false
       end
-    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATE
+    elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_DATE
       unix_timestamp = nil
       begin
         unix_timestamp = DateTime.parse(attribute_val).to_time.to_i
@@ -405,26 +405,26 @@ class Airship
 
       attribute_val = unix_timestamp
 
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+      elsif operator == RULE_OPERATOR_TYPE_IN
         return !value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+      elsif operator == RULE_OPERATOR_TYPE_NOT_IN
         return value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_FROM
+      elsif operator == RULE_OPERATOR_TYPE_FROM
         return attribute_val >= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_UNTIL
+      elsif operator == RULE_OPERATOR_TYPE_UNTIL
         return attribute_val <= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_AFTER
+      elsif operator == RULE_OPERATOR_TYPE_AFTER
         return attribute_val > value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_BEFORE
+      elsif operator == RULE_OPERATOR_TYPE_BEFORE
         return attribute_val < value
       else
         return false
       end
-    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATETIME
+    elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_DATETIME
       unix_timestamp = nil
       begin
         unix_timestamp = DateTime.parse(attribute_val).to_time.to_i
@@ -437,21 +437,21 @@ class Airship
 
       attribute_val = unix_timestamp
 
-      if operator == Airship::RULE_OPERATOR_TYPE_IS
+      if operator == RULE_OPERATOR_TYPE_IS
         return attribute_val == value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+      elsif operator == RULE_OPERATOR_TYPE_IS_NOT
         return attribute_val != value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+      elsif operator == RULE_OPERATOR_TYPE_IN
         return !value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+      elsif operator == RULE_OPERATOR_TYPE_NOT_IN
         return value_list.index(attribute_val).nil?
-      elsif operator == Airship::RULE_OPERATOR_TYPE_FROM
+      elsif operator == RULE_OPERATOR_TYPE_FROM
         return attribute_val >= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_UNTIL
+      elsif operator == RULE_OPERATOR_TYPE_UNTIL
         return attribute_val <= value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_AFTER
+      elsif operator == RULE_OPERATOR_TYPE_AFTER
         return attribute_val > value
-      elsif operator == Airship::RULE_OPERATOR_TYPE_BEFORE
+      elsif operator == RULE_OPERATOR_TYPE_BEFORE
         return attribute_val < value
       else
         return false
@@ -507,13 +507,13 @@ class Airship
       }
     end
 
-    if control_info['type'] == Airship::CONTROL_TYPE_BOOLEAN
+    if control_info['type'] == CONTROL_TYPE_BOOLEAN
       return {
         'is_enabled' => true,
         'variation' => nil,
         'is_eligible' => true,
       }
-    elsif control_info['type'] == Airship::CONTROL_TYPE_MULTIVARIATE
+    elsif control_info['type'] == CONTROL_TYPE_MULTIVARIATE
       if control_info['distributions'].size == 0
         return {
           'is_enabled' => true,
@@ -522,8 +522,8 @@ class Airship
         }
       end
 
-      percentage_based_distributions = control_info['distributions'].select { |d| d['type'] == Airship::DISTRIBUTION_TYPE_PERCENTAGE_BASED }
-      rule_based_distributions = control_info['distributions'].select { |d| d['type'] == Airship::DISTRIBUTION_TYPE_RULE_BASED }
+      percentage_based_distributions = control_info['distributions'].select { |d| d['type'] == DISTRIBUTION_TYPE_PERCENTAGE_BASED }
+      rule_based_distributions = control_info['distributions'].select { |d| d['type'] == DISTRIBUTION_TYPE_RULE_BASED }
 
       if percentage_based_distributions.size != 0 && rule_based_distributions.size != 0
         puts 'Rule integrity error: please contact support@airshiphq.com'
@@ -709,7 +709,7 @@ class Airship
       return false
     end
 
-    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
       return false
@@ -761,7 +761,7 @@ class Airship
       return nil
     end
 
-    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
       return nil
@@ -813,7 +813,7 @@ class Airship
       return false
     end
 
-    validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
       return false
