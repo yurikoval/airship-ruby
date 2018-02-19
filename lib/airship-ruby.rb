@@ -625,7 +625,7 @@ class Airship
 
     control_info = @gating_info_map[control_short_name]
 
-    if controlInfo.is_on
+    if control_info['is_on']
       return {
         'is_enabled' => false,
         'variation' => nil,
@@ -726,7 +726,7 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
     finish = Time.now
 
     if (_should_send_stats)
@@ -772,7 +772,7 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
     finish = Time.now
 
     if (_should_send_stats)
@@ -818,7 +818,7 @@ class Airship
     gate_timestamp = Time.now.iso8601
 
     start = Time.now
-    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(control_short_name, object)
     finish = Time.now
 
     if (_should_send_stats)
