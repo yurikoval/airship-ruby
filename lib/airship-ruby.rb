@@ -302,6 +302,32 @@ class Airship
     self._check_batch_size_and_maybe_process
   end
 
+  def _clone_object(object)
+    copy = object.clone
+
+    if (!object['attributes'].nil?) {
+      copy['attributes'] = object['attributes'].clone
+    }
+
+    if (!object['group'].nil?) {
+      copy['group'] = object['group'].clone
+
+      if (!object['group']['attributes'].nil?) {
+        copy['group']['attributes'] = object['group']['attributes'].clone
+      }
+    }
+
+    copy
+  end
+
+  def _validate_nesting(object)
+    if (object['is_group'] === true && !object['group'].nil?) {
+      return 'A group cannot be nested inside another group'
+    }
+
+    nil
+  end
+
   def enabled?(control_short_name, object)
     if @gating_info_map.nil?
       return false
@@ -310,6 +336,15 @@ class Airship
     validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
+      return false
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
       return false
     end
   end
@@ -324,6 +359,15 @@ class Airship
       puts validation_errors[0]
       return nil
     end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return nil
+    end
   end
 
   def eligible?(control_short_name, object)
@@ -334,6 +378,15 @@ class Airship
     validation_errors = JSON::Validator.fully_validate(Airship::SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
+      return false
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
       return false
     end
   end
