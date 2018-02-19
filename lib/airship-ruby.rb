@@ -470,8 +470,8 @@ class Airship
           'is_eligible' => is_enabled,
           '_from_enablement' => true,
         }
-      }
-    }
+      end
+    end
 
     sampled_inside_base_population = false
     control_info['rule_sets'].each do |rule_set|
