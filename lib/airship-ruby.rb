@@ -389,7 +389,7 @@ class Airship
     elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATE
       unix_timestamp = nil
       begin
-        unix_timestamp = DateTime.parse(attribute_val).to_i
+        unix_timestamp = DateTime.parse(attribute_val).to_time.to_i
       rescue Exception => e
         return false
       end
@@ -400,8 +400,8 @@ class Airship
         return false
       end
 
-      value = value && DateTime.parse(value).to_i
-      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_i }
+      value = value && DateTime.parse(value).to_time.to_i
+      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_time.to_i }
 
       attribute_val = unix_timestamp
 
@@ -427,13 +427,13 @@ class Airship
     elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATETIME
       unix_timestamp = nil
       begin
-        unix_timestamp = DateTime.parse(attribute_val).to_i
+        unix_timestamp = DateTime.parse(attribute_val).to_time.to_i
       rescue Exception => e
         return false
       end
 
-      value = value && DateTime.parse(value).to_i
-      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_i }
+      value = value && DateTime.parse(value).to_time.to_i
+      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_time.to_i }
 
       attribute_val = unix_timestamp
 
