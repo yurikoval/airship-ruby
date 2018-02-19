@@ -4,7 +4,7 @@ require 'concurrent'
 require 'digest'
 require 'rubygems'
 require 'json-schema'
-require 'time'
+require 'date'
 
 
 class Airship
@@ -303,6 +303,313 @@ class Airship
     @gate_stats_batch_lock.release
 
     self._check_batch_size_and_maybe_process
+  end
+
+  def _satisfies_rule(rule, object)
+    attribute_type = rule['attribute_type']
+    operator = rule['operator']
+    attribute_name = rule['attribute_name']
+    value = rule['value']
+    value_list = rule['value_list']
+
+    if object['attributes'].nil? || object['attributes'][attribute_name].nil?
+      return false
+    end
+
+    attribute_val = object['attributes'][attribute_name]
+
+    if attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_STRING
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+        return !value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+        return value_list.index(attribute_val).nil?
+      else
+        return false
+      end
+    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_INT
+      value = value && value.to_i
+      value_list = value_list && value_list.map { |v| v.to_i }
+
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+        return !value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+        return value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_LT
+        return attribute_val < value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_LTE
+        return attribute_val <= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_GT
+        return attribute_val > value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_GTE
+        return attribute_val >= value
+      else
+        return false
+      end
+    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_FLOAT
+      value = value && value.to_f
+      value_list = value_list && value_list.map { |v| v.to_f }
+
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+        return !value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+        return value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_LT
+        return attribute_val < value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_LTE
+        return attribute_val <= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_GT
+        return attribute_val > value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_GTE
+        return attribute_val >= value
+      else
+        return false
+      end
+    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_BOOLEAN
+      value = (value == 'true') ? true : false
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      else
+        return false
+      end
+    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATE
+      unix_timestamp = nil
+      begin
+        unix_timestamp = DateTime.parse(attribute_val).to_i
+      rescue Exception => e
+        return false
+      end
+
+      iso_format = DateTime.parse(attribute_val)
+
+      if !iso_format.end_with?('T00:00:00+00:00')
+        return false
+      end
+
+      value = value && DateTime.parse(value).to_i
+      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_i }
+
+      attribute_val = unix_timestamp
+
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+        return !value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+        return value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_FROM
+        return attribute_val >= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_UNTIL
+        return attribute_val <= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_AFTER
+        return attribute_val > value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_BEFORE
+        return attribute_val < value
+      else
+        return false
+      end
+    elsif attribute_type == Airship::OBJECT_ATTRIBUTE_TYPE_DATETIME
+      unix_timestamp = nil
+      begin
+        unix_timestamp = DateTime.parse(attribute_val).to_i
+      rescue Exception => e
+        return false
+      end
+
+      value = value && DateTime.parse(value).to_i
+      value_list = value_list && value_list.map { |v| DateTime.parse(v).to_i }
+
+      attribute_val = unix_timestamp
+
+      if operator == Airship::RULE_OPERATOR_TYPE_IS
+        return attribute_val == value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IS_NOT
+        return attribute_val != value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_IN
+        return !value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_NOT_IN
+        return value_list.index(attribute_val).nil?
+      elsif operator == Airship::RULE_OPERATOR_TYPE_FROM
+        return attribute_val >= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_UNTIL
+        return attribute_val <= value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_AFTER
+        return attribute_val > value
+      elsif operator == Airship::RULE_OPERATOR_TYPE_BEFORE
+        return attribute_val < value
+      else
+        return false
+      end
+    else
+      return false
+    end
+  end
+
+  def _get_gate_values_for_object(control_info, object)
+    if !control_info['enablements_info'][object.type].nil?
+      if !control_info['enablements_info'][object.type][object.id].nil?
+        is_enabled, variation = control_info['enablements_info'][object.type][object.id]
+        return {
+          'is_enabled' => is_enabled,
+          'variation' => variation,
+          'is_eligible' => is_enabled,
+          '_from_enablement' => true,
+        }
+      }
+    }
+
+    sampled_inside_base_population = false
+    control_info['rule_sets'].each do |rule_set|
+      if sampled_inside_base_population
+        break
+
+      rules = rule_set['rules']
+
+      if rule_set['client_object_type_name'] != object['type']
+        next
+      end
+
+      satisfies_all_rules = true
+      rules.each do |rule|
+        satisfies_all_rules = satisfies_all_rules && self._satisfies_rule(rule, object)
+      end
+
+      if satisfies_all_rules
+        hash_key = "SAMPLING:control_#{control_info.id}:env_#{@gating_info['env']['id']}:rule_set_#{rule_set['id']}:client_object_#{object['type']}_#{object['id']}"
+        if Airship.get_hashed_value(hash_key) <= rule_set['sampling_percentage']
+          sampled_inside_base_population = true
+        end
+      end
+    end
+
+    if !sampled_inside_base_population
+      return {
+        'is_enabled' => false,
+        'variation' => nil,
+        'is_eligible' => false,
+      }
+    end
+
+    if control_info['type'] == Airship::CONTROL_TYPE_BOOLEAN
+      return {
+        'is_enabled' => true,
+        'variation' => nil,
+        'is_eligible' => true,
+      }
+    elsif control_info['type'] == Airship::CONTROL_TYPE_MULTIVARIATE
+      if control_info['distributions'].size == 0
+        return {
+          'is_enabled' => true,
+          'variation' => control_info['default_variation'],
+          'is_eligible' => true,
+        }
+      end
+
+      percentage_based_distributions = control_info['distributions'].select { |d| d['type'] == Airship::DISTRIBUTION_TYPE_PERCENTAGE_BASED }
+      rule_based_distributions = control_info['distributions'].select { |d| d['type'] == Airship::DISTRIBUTION_TYPE_RULE_BASED }
+
+      if percentage_based_distributions.size != 0 && rule_based_distributions.size != 0
+        puts 'Rule integrity error: please contact support@airshiphq.com'
+        return {
+          'is_enabled' => false,
+          'variation' => nil,
+          'is_eligible' => false,
+        }
+      end
+
+      if percentage_based_distributions.size != 0
+        delta = 0.0001
+        sum_percentages = 0.0
+        running_percentages = []
+        percentage_based_distributions.each do |distribution|
+          sum_percentages += distribution['percentage']
+          if running_percentages.size == 0
+            running_percentages.push(distribution['percentage'])
+          else
+            running_percentages.push(running_percentages[running_percentages.size - 1] + distribution['percentage'])
+          end
+        end
+
+        if (1.0 - sum_percentages).abs > delta
+          puts 'Rule integrity error: please contact support@airshiphq.com'
+          return {
+            'is_enabled' => false,
+            'variation' => nil,
+            'is_eligible' => false,
+          }
+        end
+
+        hash_key = "DISTRIBUTION:control_#{control_info['id']}:env_#{@gating_info['env']['id']}:client_object_#{object['type']}_#{object['id']}"
+        hashed_percentage = Airship.get_hashed_value(hash_key)
+
+        running_percentages.each_with_index do |percentage, i|
+          if hashed_percentage <= percentage
+            return {
+              'is_enabled' => true,
+              'variation' => percentage_based_distributions[i]['variation'],
+              'is_eligible' => true,
+            }
+          end
+        end
+
+        return {
+          'is_enabled' => true,
+          'variation' => percentage_based_distributions[percentage_based_distributions.size - 1]['variation'],
+          'is_eligible' => true,
+        }
+      else
+        rule_based_distributions.each do |distribution|
+
+          rule_set = distribution['rule_set']
+          rules = rule_set['rules']
+
+          if rule_set['client_object_type_name'] != object['type']
+            next
+          end
+
+          satisfies_all_rules = true
+          rules.each do |rule|
+            satisfies_all_rules = satisfies_all_rules && self._satisfies_rule(rule, object)
+          end
+
+          if satisfies_all_rules
+            return {
+              'is_enabled' => true,
+              'variation' => distribution['variation'],
+              'is_eligible' => true,
+            }
+          end
+        end
+
+        return {
+          'is_enabled' => true,
+          'variation' => control_info['rule_based_distribution_default_variation'] || control_info['default_variation'],
+          'is_eligible' => true,
+          '_rule_based_default_variation' => true,
+        }
+      end
+    else
+      return {
+        'is_enabled' => false,
+        'variation' => nil,
+        'is_eligible' => false,
+      }
+    end
   end
 
   def _get_gate_values(control_short_name, object)
