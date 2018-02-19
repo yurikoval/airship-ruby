@@ -477,6 +477,7 @@ class Airship
     control_info['rule_sets'].each do |rule_set|
       if sampled_inside_base_population
         break
+      end
 
       rules = rule_set['rules']
 
