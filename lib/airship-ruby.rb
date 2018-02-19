@@ -305,6 +305,72 @@ class Airship
     self._check_batch_size_and_maybe_process
   end
 
+  def _get_gate_values(control_short_name, object)
+    if @gating_info_map[control_short_name].nil?
+      return {
+        'is_enabled' => false,
+        'variation' => nil,
+        'is_eligible' => false,
+        '_should_send_stats' => false,
+      }
+    end
+
+    control_info = @gating_info_map[control_short_name]
+
+    if controlInfo.is_on
+      return {
+        'is_enabled' => false,
+        'variation' => nil,
+        'is_eligible' => false,
+        '_should_send_stats' => true,
+      }
+    end
+
+    group = nil
+    if !object['group'].nil?
+      group = object['group']
+    end
+
+    result = self._get_gate_values_for_object(control_info, object)
+
+    if !group.nil?
+      if group['type'].nil?
+        group['type'] = "#{object['type']}Group"
+        group['is_group'] = true
+      end
+      group_result = self._get_gate_values_for_object(control_info, group)
+
+      if result['_from_enablement'] == true && !result['is_enabled']
+        # Do nothing
+      elsif result['_from_enablement'] != true && group_result['_from_enablement'] == true && !group_result['is_enabled']
+        result['is_enabled'] = group_result['is_enabled']
+        result['variation'] = group_result['variation']
+        result['is_eligible'] = group_result['is_eligible']
+      elsif result['is_enabled']
+        if result['_rule_based_default_variation'] == true
+          if group_result['is_enabled']
+            result['is_enabled'] = group_result['is_enabled']
+            result['variation'] = group_result['variation']
+            result['is_eligible'] = group_result['is_eligible']
+          else
+            # Do nothing
+          end
+        else
+          # Do nothing
+        end
+      elsif group_result['is_enabled']
+        result['is_enabled'] = group_result['is_enabled']
+        result['variation'] = group_result['variation']
+        result['is_eligible'] = group_result['is_eligible']
+      else
+        # Do nothing
+      end
+    end
+
+    result['_should_send_stats'] = true
+    result
+  end
+
   def _clone_object(object)
     copy = object.clone
 
