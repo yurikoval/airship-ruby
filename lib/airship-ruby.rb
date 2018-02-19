@@ -4,6 +4,7 @@ require 'concurrent'
 require 'digest'
 require 'rubygems'
 require 'json-schema'
+require 'time'
 require 'date'
 
 
@@ -393,7 +394,7 @@ class Airship
         return false
       end
 
-      iso_format = DateTime.parse(attribute_val)
+      iso_format = DateTime.parse(attribute_val).iso8601
 
       if !iso_format.end_with?('T00:00:00+00:00')
         return false
