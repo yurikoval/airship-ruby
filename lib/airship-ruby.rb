@@ -103,7 +103,7 @@ class Airship
     "additionalProperties" => false,
   }
 
-  SERVER_URL = 'http://localhost:8000'
+  SERVER_URL = 'https://api.airshiphq.com'
   IDENTIFY_ENDPOINT = "#{SERVER_URL}/v1/identify"
   GATING_INFO_ENDPOINT = "#{SERVER_URL}/v1/gating-info"
   PLATFORM = 'ruby'
