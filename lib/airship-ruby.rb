@@ -305,27 +305,25 @@ class Airship
   def _clone_object(object)
     copy = object.clone
 
-    if (!object['attributes'].nil?) {
+    if !object['attributes'].nil?
       copy['attributes'] = object['attributes'].clone
-    }
+    end
 
-    if (!object['group'].nil?) {
+    if !object['group'].nil?
       copy['group'] = object['group'].clone
 
-      if (!object['group']['attributes'].nil?) {
+      if !object['group']['attributes'].nil?
         copy['group']['attributes'] = object['group']['attributes'].clone
-      }
-    }
+      end
+    end
 
     copy
   end
 
   def _validate_nesting(object)
-    if (object['is_group'] === true && !object['group'].nil?) {
+    if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
-    }
-
-    nil
+    end
   end
 
   def enabled?(control_short_name, object)
