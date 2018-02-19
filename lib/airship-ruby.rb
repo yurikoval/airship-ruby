@@ -4,6 +4,7 @@ require 'concurrent'
 require 'digest'
 require 'rubygems'
 require 'json-schema'
+require 'time'
 
 
 class Airship
@@ -143,6 +144,8 @@ class Airship
   RULE_OPERATOR_TYPE_UNTIL = 'UNTIL'
   RULE_OPERATOR_TYPE_AFTER = 'AFTER'
   RULE_OPERATOR_TYPE_BEFORE = 'BEFORE'
+
+  @@sdk_id = [('a'..'z'), ('A'..'Z'), (0..9)].map(&:to_a).flatten.sample(6).join('')
 
   class << self
     def get_hashed_value(s)
@@ -345,6 +348,33 @@ class Airship
       puts error
       return false
     end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    finish = Time.now
+
+    if (_should_send_stats)
+      sdk_gate_control_short_name = control_short_name
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+      sdk_id = @@sdk_id
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_enabled
   end
 
   def variation(control_short_name, object)
@@ -366,6 +396,33 @@ class Airship
       puts error
       return nil
     end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    finish = Time.now
+
+    if (_should_send_stats)
+      sdk_gate_control_short_name = control_short_name
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+      sdk_id = @@sdk_id
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return variation
   end
 
   def eligible?(control_short_name, object)
@@ -387,5 +444,32 @@ class Airship
       puts error
       return false
     end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+    is_enabled, variation, is_eligible, _should_send_stats = self._get_gate_values(object)
+    finish = Time.now
+
+    if (_should_send_stats)
+      sdk_gate_control_short_name = control_short_name
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+      sdk_id = @@sdk_id
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = sdk_gate_control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_eligible
   end
 end
