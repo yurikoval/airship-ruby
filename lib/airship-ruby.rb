@@ -625,7 +625,7 @@ class Airship
 
     control_info = @gating_info_map[control_short_name]
 
-    if control_info['is_on']
+    if !control_info['is_on']
       return {
         'is_enabled' => false,
         'variation' => nil,
