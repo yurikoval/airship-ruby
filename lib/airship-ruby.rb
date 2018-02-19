@@ -731,7 +731,7 @@ class Airship
     is_enabled = gate_values['is_enabled']
     variation = gate_values['variation']
     is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats'] != false
+    _should_send_stats = gate_values['_should_send_stats']
 
     finish = Time.now
 
@@ -783,7 +783,7 @@ class Airship
     is_enabled = gate_values['is_enabled']
     variation = gate_values['variation']
     is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats'] != false
+    _should_send_stats = gate_values['_should_send_stats']
 
     finish = Time.now
 
@@ -835,7 +835,7 @@ class Airship
     is_enabled = gate_values['is_enabled']
     variation = gate_values['variation']
     is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats'] != false
+    _should_send_stats = gate_values['_should_send_stats']
 
     finish = Time.now
 
