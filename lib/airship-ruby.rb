@@ -266,7 +266,16 @@ class Airship
 
   def _create_processor(batch)
     return Concurrent::ScheduledTask.execute(0) do |task|
-      # TODO: use Faraday to upload
+      conn = Faraday.new(url: IDENTIFY_ENDPOINT)
+      response = conn.post do |req|
+        req.options.timeout = 10
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['api-key'] = @api_key
+        req.body = JSON.generate({
+          'env_key' => @env_key,
+          'objects' => batch,
+        })
+      end
     end
   end
 
