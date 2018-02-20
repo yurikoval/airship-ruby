@@ -26,5 +26,7 @@ object = {
 
 airship.enabled?("bitcoin-pay", object)
 airship.variation("bitcoin-pay", object) # For multi-variate flags
-airship.eligible?("bitcoin-pay", object) # Returns true if the object can potentially receive the feature via sampling or is already receiving the feature.
+airship.eligible?("bitcoin-pay", object)
+# Returns true if the object can potentially receive the feature via sampling
+# or is already receiving the feature.
 ```
