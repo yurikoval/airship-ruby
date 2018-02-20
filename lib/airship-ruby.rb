@@ -280,6 +280,13 @@ class Airship
   end
 
   def _process_batch(limit, gate_stats=nil)
+    # This is sort of a weird function.
+    # We process the batch if the batch size
+    # is more than limit. The second param
+    # allows for an additional gate_states to
+    # be inserted before the processing check
+    # is performed.
+
     processed = false
     @gate_stats_batch_lock.acquire
     if !gate_stats.nil?
