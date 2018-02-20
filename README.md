@@ -56,7 +56,8 @@ object = {
 
 ## Group (for membership-like cascading behavior)
 ```ruby
-# The structure of a group object is just like that of the base object
+# An object can be a member of a group.
+# The structure of a group object is just like that of the base object.
 object = {
   "type" => "User",
   "id" => "1234",
