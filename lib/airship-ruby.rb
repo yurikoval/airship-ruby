@@ -279,9 +279,12 @@ class Airship
     end
   end
 
-  def _process_batch(limit)
+  def _process_batch(limit, gate_stats=nil)
     processed = false
     @gate_stats_batch_lock.acquire
+    if !gate_stats.nil?
+      @gate_stats_batch.push(gate_stats)
+    end
     if @gate_stats_batch.size > limit
       new_gate_stats_uploader_tasks = []
       @gate_stats_uploader_tasks.each do |task|
@@ -299,20 +302,12 @@ class Airship
     processed
   end
 
-  def _check_batch_size_and_maybe_process
-    processed = self._process_batch(@max_gate_stats_batch_size - 1)
+  def _upload_stats_async(gate_stats)
+    processed = self._process_batch(@max_gate_stats_batch_size - 1, gate_stats)
     if processed
       now = Time.now.utc.to_i
       @gate_stats_last_task_scheduled_timestamp.value = now
     end
-  end
-
-  def _upload_stats_async(gate_stats)
-    @gate_stats_batch_lock.acquire
-    @gate_stats_batch.push(gate_stats)
-    @gate_stats_batch_lock.release
-
-    self._check_batch_size_and_maybe_process
   end
 
   def _satisfies_rule(rule, object)
