@@ -253,9 +253,9 @@ class Airship
   end
 
   def _create_watcher
-    Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
+    Concurrent::TimerTask.new(execution_interval: @gate_stats_upload_batch_interval, timeout_interval: 10, run_now: true) do |task|
       now = Time.now.utc.to_i
-      if now - @gate_stats_last_task_scheduled_timestamp.value >= 60
+      if now - @gate_stats_last_task_scheduled_timestamp.value >= @gate_stats_upload_batch_interval
         processed = self._process_batch(0)
         if processed
           @gate_stats_last_task_scheduled_timestamp.value = now
