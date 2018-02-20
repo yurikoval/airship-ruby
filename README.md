@@ -45,7 +45,8 @@ object = {
     "t_shirt_size" => "M",
     "date_created" => "2018-02-18",
     "time_converted" => "2018-02-20T21:54:00.630815+00:00",
-    "owns_property" => true
+    "owns_property" => true,
+    "age" => 39
   }
 }
 
