@@ -78,12 +78,12 @@ object = {
   }
 }
 
-# Inheritance of values `enabled?`, `variation`, and `eligible?` work as follows:
+# Inheritance of values `enabled?`, `variation`, and `eligible?` works as follows:
 # 1. If the group is enabled, but the base object is not,
-# then the base object will inherit the values `enabled?`, `variation`, and
-# `eligible?` of the group object.
+#    then the base object will inherit the values `enabled?`, `variation`, and
+#    `eligible?` of the group object.
 # 2. If the base object is explicitly blacklisted, then it will not inherit.
 # 3. If the base object is not given a variation in rule-based variation assignment,
-# but the group is and both are enabled, then the base object will inherit
-# the variation of the group's.
+#    but the group is and both are enabled, then the base object will inherit
+#    the variation of the group's.
 ```
