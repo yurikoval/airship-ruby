@@ -30,3 +30,24 @@ airship.eligible?("bitcoin-pay", object)
 # Returns true if the object can potentially receive the feature via sampling
 # or is already receiving the feature.
 ```
+
+
+## Attributes (for complex targeting)
+```ruby
+# Define your object with an attributes dictionary of key-value pairs.
+# Values must be a string, a number, or a boolean. nil values are not accepted.
+# For date or datetime string value, use iso8601 format.
+object = {
+  "type" => "User",
+  "id" => "1234",
+  "display_name" => "ironman@stark.com",
+  "attributes" => {
+    "t_shirt_size" => "M",
+    "date_created" => "2018-01-01",
+    "is_employee" => true
+  }
+}
+
+# Now in app.airshiphq.com, you can target this particular user using its
+# attributes
+```
