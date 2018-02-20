@@ -1,85 +1,30 @@
 # airship-ruby
 
 ## Installation
-`gem install airship-client`
+`gem install airship-ruby`
 
 
 ## Usage
 ```ruby
-require "airship-client"
+require "airship-ruby"
 
-# Sets the global api_key and env_key
-AirshipClient.init(<api_key>, <env_key>)
+# Create an instance with api_key and env_key
+airship = Airship.new({api_key: <api_key>, env_key: <env_key>})
 
 # e.g.,
-# AirshipClient.init("r9b72kqdh1wbzkpkf7gntwfapqoc26bl", "nxmqp35umrd3djth")
+# airship = Airship.new({api_key: "r9b72kqdh1wbzkpkf7gntwfapqoc26bl", env_key: "nxmqp35umrd3djth"})
 
-# Create a new client
-client = AirshipClient.new
+# Initialize the instance. After init, the instance becomes thread-safe
+airship.init()
 
-# Override env_key on an instance basis (nil means do not override that particular param, in this case the api_key)
-client = AirshipClient.new(nil, "vuvl5bn7btteq8vl")
-
-
-# There are four methods to the client:
-# 1. identify(<obj>|[<obj>, ...])
-#    - For individual or bulk data ingestion
-# 2. gate(<control_short_name>, <obj>|[<obj>, ...])
-#    - Querying for a single object's or multiple objects' control information while ingesting at the same time
-#    - If a single object is passed, then the ingestion is synchronous. When multiple objects are passed, the ingestion is asynchronous
-# 3. get_value
-#    - Convenience method for getting the boolean value
-# 4. get_variation
-#    - Convenience method for getting the variation associated with a multi-variate control/flag
-
+# Define your object
 object = {
   "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar"
   "id" => "1234", # "id" must be a string, so if you wish to pass an integer, simply convert via .to_s
-  "display_name" => "ironman@stark.com"
+  "display_name" => "ironman@stark.com" # must also be a string
 }
 
-client.identify(object)
-client.identify([object])
-client.gate("bitcoin-pay", object)
-client.get_value("bitcoin-pay", object)
-client.get_variation("bitcoin-pay", object)
+airship.enabled?("bitcoin-pay", object)
+airship.variation("bitcoin-pay", object) # For multi-variate flags
+airship.eligible?("bitcoin-pay", object) # Returns true if the object can potentially receive the feature via sampling or is already receiving the feature.
 ```
-
-## Graceful failure
-When graceful failure mode is enabled (which is the default), if a gate call to Airship's server fails or times out, the SDK will return the following value:
-```ruby
-{
-    ...
-    "control" => {
-        "value" => false,
-        "variation" => nil,
-        "from_server" => false
-    }
-    ...
-}
-```
-
-You can turn off graceful failure during initialization:
-```ruby
-AirshipClient.init(<api_key>, <env_key>, <timeout>, <fail_gracefully>)
-```
-
-Above, `<timeout>` is the number of seconds the SDK waits for a network call before timing out and failing gracefully. The default value is 2 seconds.
-
-Note: if a gate call to the server is successful, the `from_server` field will be missing.
-
-## Base population eligibility
-The `eligible` flag indicates whether an object is part of the base population.
-```ruby
-{
-    ...
-    "control" => {
-        "value" => false,
-        "variation" => nil,
-        "eligible" => true
-    }
-    ...
-}
-```
-
-Note: if a gate call to the server fails, the `eligible` field will be missing.
