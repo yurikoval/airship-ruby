@@ -73,8 +73,10 @@ object = {
     "type" => "Club",
     "id" => "5678",
     "display_name" => "SF Homeowners Club",
-    "founded" => "2016-01-01",
-    "active" => true
+    "attributes" => {
+      "founded" => "2016-01-01",
+      "active" => true
+    }
   }
 }
 
@@ -86,4 +88,19 @@ object = {
 # 3. If the base object is not given a variation in rule-based variation assignment,
 #    but the group is and both are enabled, then the base object will inherit
 #    the variation of the group's.
+
+
+# You can ask questions about the group directly (use the `is_group` flag):
+object = {
+  "is_group" => true,
+  "type" => "Club",
+  "id" => "5678",
+  "display_name" => "SF Homeowners Club",
+  "attributes" => {
+    "founded" => "2016-01-01",
+    "active" => true
+  }
+}
+
+airship.enabled?("bitcoin-pay", object)
 ```
