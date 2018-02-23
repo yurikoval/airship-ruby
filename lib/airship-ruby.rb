@@ -206,15 +206,11 @@ class Airship
     @initialization_lock.release
   end
 
-  def enabled?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
+  def enabled?(control_short_name, object, default_value=false)
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
-      return false
+      return default_value
     end
 
     object = self._clone_object(object)
@@ -223,7 +219,11 @@ class Airship
 
     if !error.nil?
       puts error
-      return false
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
     end
 
     gate_timestamp = Time.now.iso8601
@@ -258,15 +258,11 @@ class Airship
     return is_enabled
   end
 
-  def variation(control_short_name, object)
-    if @gating_info_map.nil?
-      return nil
-    end
-
+  def variation(control_short_name, object, default_value=nil)
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
-      return nil
+      return default_value
     end
 
     object = self._clone_object(object)
@@ -275,7 +271,11 @@ class Airship
 
     if !error.nil?
       puts error
-      return nil
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
     end
 
     gate_timestamp = Time.now.iso8601
@@ -310,15 +310,11 @@ class Airship
     return variation
   end
 
-  def eligible?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
+  def eligible?(control_short_name, object, default_value=false)
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
-      return false
+      return default_value
     end
 
     object = self._clone_object(object)
@@ -327,7 +323,11 @@ class Airship
 
     if !error.nil?
       puts error
-      return false
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
     end
 
     gate_timestamp = Time.now.iso8601
