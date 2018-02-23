@@ -182,12 +182,17 @@ class Airship
 
     @gate_stats_batch = []
 
+    @initialization_lock = Concurrent::Semaphore.new(1)
     @gate_stats_batch_lock = Concurrent::Semaphore.new(1)
   end
 
   def init
-    # Not thread safe yet
+    @initialization_lock.acquire
     if @gating_info_downloader_task.nil?
+      self._poll
+      if @gating_info.nil?
+        raise Exception.new('Failed to connect to Airship server')
+      end
       @gating_info_downloader_task = self._create_poller
       @gating_info_downloader_task.execute
     end
@@ -196,7 +201,7 @@ class Airship
       @gate_stats_watcher = self._create_watcher
       @gate_stats_watcher.execute
     end
-    # Thread safe after this point
+    @initialization_lock.release
   end
 
   def _get_gating_info_map(gating_info)
@@ -236,19 +241,23 @@ class Airship
     map
   end
 
+  def _poll
+    conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
+    response = conn.get do |req|
+      req.options.timeout = 10
+      req.headers['api-key'] = @api_key
+    end
+    if response.status == 200
+      gating_info = JSON.parse(response.body)
+      gating_info_map = self._get_gating_info_map(gating_info)
+      @gating_info = gating_info
+      @gating_info_map = gating_info_map
+    end
+  end
+
   def _create_poller
     Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
-      conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
-      response = conn.get do |req|
-        req.options.timeout = 10
-        req.headers['api-key'] = @api_key
-      end
-      if response.status == 200
-        gating_info = JSON.parse(response.body)
-        gating_info_map = self._get_gating_info_map(gating_info)
-        @gating_info = gating_info
-        @gating_info_map = gating_info_map
-      end
+      self._poll
     end
   end
 
