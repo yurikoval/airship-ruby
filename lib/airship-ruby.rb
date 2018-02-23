@@ -169,6 +169,7 @@ class Airship
 
     @gating_info = nil
     @gating_info_downloader_task = nil
+    @gating_info_polling_interval = 60
 
     @gating_info_map = nil
 
@@ -182,12 +183,18 @@ class Airship
 
     @gate_stats_batch = []
 
+    @initialization_lock = Concurrent::Semaphore.new(1)
     @gate_stats_batch_lock = Concurrent::Semaphore.new(1)
   end
 
   def init
-    # Not thread safe yet
+    @initialization_lock.acquire
     if @gating_info_downloader_task.nil?
+      self._poll
+      if @gating_info.nil?
+        @initialization_lock.release
+        raise Exception.new('Failed to connect to Airship server')
+      end
       @gating_info_downloader_task = self._create_poller
       @gating_info_downloader_task.execute
     end
@@ -196,8 +203,166 @@ class Airship
       @gate_stats_watcher = self._create_watcher
       @gate_stats_watcher.execute
     end
-    # Thread safe after this point
+    @initialization_lock.release
   end
+
+  def enabled?(control_short_name, object, default_value=false)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return default_value
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_enabled
+  end
+
+  def variation(control_short_name, object, default_value=nil)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return default_value
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return variation
+  end
+
+  def eligible?(control_short_name, object, default_value=false)
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return default_value
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return default_value
+    end
+
+    if @gating_info_map.nil?
+      return default_value
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_eligible
+  end
+
+  protected
 
   def _get_gating_info_map(gating_info)
     map = {}
@@ -236,24 +401,28 @@ class Airship
     map
   end
 
+  def _poll
+    conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
+    response = conn.get do |req|
+      req.options.timeout = 10
+      req.headers['api-key'] = @api_key
+    end
+    if response.status == 200
+      gating_info = JSON.parse(response.body)
+      gating_info_map = self._get_gating_info_map(gating_info)
+      @gating_info = gating_info
+      @gating_info_map = gating_info_map
+    end
+  end
+
   def _create_poller
-    Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10, run_now: true) do |task|
-      conn = Faraday.new(url: "#{GATING_INFO_ENDPOINT}/#{@env_key}")
-      response = conn.get do |req|
-        req.options.timeout = 10
-        req.headers['api-key'] = @api_key
-      end
-      if response.status == 200
-        gating_info = JSON.parse(response.body)
-        gating_info_map = self._get_gating_info_map(gating_info)
-        @gating_info = gating_info
-        @gating_info_map = gating_info_map
-      end
+    Concurrent::TimerTask.new(execution_interval: @gating_info_polling_interval, timeout_interval: 10) do |task|
+      self._poll
     end
   end
 
   def _create_watcher
-    Concurrent::TimerTask.new(execution_interval: @gate_stats_upload_batch_interval, timeout_interval: 10, run_now: true) do |task|
+    Concurrent::TimerTask.new(execution_interval: @gate_stats_upload_batch_interval, timeout_interval: 10) do |task|
       now = Time.now.utc.to_i
       if now - @gate_stats_last_task_scheduled_timestamp.value >= @gate_stats_upload_batch_interval
         processed = self._process_batch(0)
@@ -713,161 +882,5 @@ class Airship
     if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
     end
-  end
-
-  def enabled?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return false
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return false
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return is_enabled
-  end
-
-  def variation(control_short_name, object)
-    if @gating_info_map.nil?
-      return nil
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return nil
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return nil
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return variation
-  end
-
-  def eligible?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return false
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return false
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return is_eligible
   end
 end
