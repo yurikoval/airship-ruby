@@ -169,6 +169,7 @@ class Airship
 
     @gating_info = nil
     @gating_info_downloader_task = nil
+    @gating_info_polling_interval = 60
 
     @gating_info_map = nil
 
@@ -256,7 +257,7 @@ class Airship
   end
 
   def _create_poller
-    Concurrent::TimerTask.new(execution_interval: 60, timeout_interval: 10) do |task|
+    Concurrent::TimerTask.new(execution_interval: @gating_info_polling_interval, timeout_interval: 10) do |task|
       self._poll
     end
   end
