@@ -205,6 +205,164 @@ class Airship
     @initialization_lock.release
   end
 
+  def enabled?(control_short_name, object)
+    if @gating_info_map.nil?
+      return false
+    end
+
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return false
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return false
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_enabled
+  end
+
+  def variation(control_short_name, object)
+    if @gating_info_map.nil?
+      return nil
+    end
+
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return nil
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return nil
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return variation
+  end
+
+  def eligible?(control_short_name, object)
+    if @gating_info_map.nil?
+      return false
+    end
+
+    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
+    if validation_errors.size > 0
+      puts validation_errors[0]
+      return false
+    end
+
+    object = self._clone_object(object)
+
+    error = self._validate_nesting(object)
+
+    if !error.nil?
+      puts error
+      return false
+    end
+
+    gate_timestamp = Time.now.iso8601
+
+    start = Time.now
+
+    gate_values = self._get_gate_values(control_short_name, object)
+    is_enabled = gate_values['is_enabled']
+    variation = gate_values['variation']
+    is_eligible = gate_values['is_eligible']
+    _should_send_stats = gate_values['_should_send_stats']
+
+    finish = Time.now
+
+    if _should_send_stats
+      sdk_gate_timestamp = gate_timestamp
+      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
+      sdk_version = SDK_VERSION
+
+      stats = {}
+      stats['sdk_gate_control_short_name'] = control_short_name
+      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
+      stats['sdk_gate_latency'] = sdk_gate_latency
+      stats['sdk_version'] = sdk_version
+      stats['sdk_id'] = @@sdk_id
+
+      object['stats'] = stats
+
+      self._upload_stats_async(object)
+    end
+
+    return is_eligible
+  end
+
+  private
+
   def _get_gating_info_map(gating_info)
     map = {}
 
@@ -723,161 +881,5 @@ class Airship
     if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
     end
-  end
-
-  def enabled?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return false
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return false
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return is_enabled
-  end
-
-  def variation(control_short_name, object)
-    if @gating_info_map.nil?
-      return nil
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return nil
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return nil
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return variation
-  end
-
-  def eligible?(control_short_name, object)
-    if @gating_info_map.nil?
-      return false
-    end
-
-    validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
-    if validation_errors.size > 0
-      puts validation_errors[0]
-      return false
-    end
-
-    object = self._clone_object(object)
-
-    error = self._validate_nesting(object)
-
-    if !error.nil?
-      puts error
-      return false
-    end
-
-    gate_timestamp = Time.now.iso8601
-
-    start = Time.now
-
-    gate_values = self._get_gate_values(control_short_name, object)
-    is_enabled = gate_values['is_enabled']
-    variation = gate_values['variation']
-    is_eligible = gate_values['is_eligible']
-    _should_send_stats = gate_values['_should_send_stats']
-
-    finish = Time.now
-
-    if _should_send_stats
-      sdk_gate_timestamp = gate_timestamp
-      sdk_gate_latency = "#{(finish - start) * 1000 * 1000}us"
-      sdk_version = SDK_VERSION
-
-      stats = {}
-      stats['sdk_gate_control_short_name'] = control_short_name
-      stats['sdk_gate_timestamp'] = sdk_gate_timestamp
-      stats['sdk_gate_latency'] = sdk_gate_latency
-      stats['sdk_version'] = sdk_version
-      stats['sdk_id'] = @@sdk_id
-
-      object['stats'] = stats
-
-      self._upload_stats_async(object)
-    end
-
-    return is_eligible
   end
 end
