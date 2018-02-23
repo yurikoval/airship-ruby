@@ -362,7 +362,7 @@ class Airship
     return is_eligible
   end
 
-  private
+  protected
 
   def _get_gating_info_map(gating_info)
     map = {}
