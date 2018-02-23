@@ -192,6 +192,7 @@ class Airship
     if @gating_info_downloader_task.nil?
       self._poll
       if @gating_info.nil?
+        @initialization_lock.release
         raise Exception.new('Failed to connect to Airship server')
       end
       @gating_info_downloader_task = self._create_poller
