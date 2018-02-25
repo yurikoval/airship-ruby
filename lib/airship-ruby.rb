@@ -605,6 +605,7 @@ class Airship
         return false
       end
     elsif attribute_type == OBJECT_ATTRIBUTE_TYPE_DATETIME
+      # to_time.to_i respects timezones
       unix_timestamp = nil
       begin
         unix_timestamp = DateTime.parse(attribute_val).to_time.to_i
