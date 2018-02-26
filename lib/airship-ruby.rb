@@ -247,6 +247,12 @@ class Airship
       stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
+
+      stats['sdk_gate_value'] = is_enabled
+      stats['sdk_gate_variation'] = variation
+      stats['sdk_gate_eligibility'] = is_eligible
+      stats['sdk_gate_type'] = 'value'
+
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
 
@@ -299,6 +305,12 @@ class Airship
       stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
+
+      stats['sdk_gate_value'] = is_enabled
+      stats['sdk_gate_variation'] = variation
+      stats['sdk_gate_eligibility'] = is_eligible
+      stats['sdk_gate_type'] = 'variation'
+
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
 
@@ -351,6 +363,12 @@ class Airship
       stats['sdk_gate_control_short_name'] = control_short_name
       stats['sdk_gate_timestamp'] = sdk_gate_timestamp
       stats['sdk_gate_latency'] = sdk_gate_latency
+
+      stats['sdk_gate_value'] = is_enabled
+      stats['sdk_gate_variation'] = variation
+      stats['sdk_gate_eligibility'] = is_eligible
+      stats['sdk_gate_type'] = 'eligibility'
+
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
 
