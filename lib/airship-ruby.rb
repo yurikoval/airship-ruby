@@ -21,7 +21,7 @@ class Airship
         "type" => "boolean",
       },
       "id" => {
-        "type" => "string",
+        "type" => ["string", "integer"],
         "maxLength" => 250,
         "minLength" => 1,
       },
@@ -64,7 +64,7 @@ class Airship
             "enum" => [true],
           },
           "id" => {
-            "type" => "string",
+            "type" => ["string", "integer"],
             "maxLength" => 250,
             "minLength" => 1,
           },
@@ -99,7 +99,7 @@ class Airship
         "additionalProperties" => false,
       },
     },
-    "required" => ["type", "id", "display_name"],
+    "required" => ["id", "display_name"],
     "additionalProperties" => false,
   }
 
@@ -215,7 +215,11 @@ class Airship
 
     object = self._clone_object(object)
 
-    error = self._validate_nesting(object)
+    if object['type'].nil?
+      object['type'] = 'User'
+    end
+
+    error = self._validate_nesting(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -273,7 +277,11 @@ class Airship
 
     object = self._clone_object(object)
 
-    error = self._validate_nesting(object)
+    if object['type'].nil?
+      object['type'] = 'User'
+    end
+
+    error = self._validate_nesting(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -331,7 +339,11 @@ class Airship
 
     object = self._clone_object(object)
 
-    error = self._validate_nesting(object)
+    if object['type'].nil?
+      object['type'] = 'User'
+    end
+
+    error = self._validate_nesting(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -902,6 +914,31 @@ class Airship
   def _validate_nesting(object)
     if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
+    end
+  end
+
+  def _maybe_transform_id(object)
+    if object['id'].is_a?(Integer)
+      id_str = object['id'].to_s
+      if id_str.length > 250
+        return 'Integer id must have 250 digits or less'
+      end
+      object['id'] = id_str
+    end
+
+    group = nil
+    if !object['group'].nil?
+      group = object['group']
+    end
+
+    if !group.nil?
+      if group['id'].is_a?(Integer)
+        id_str = group['id'].to_s
+        if id_str.length > 250
+          return 'Integer id must have 250 digits or less'
+        end
+        group['id'] = id_str
+      end
     end
   end
 end
