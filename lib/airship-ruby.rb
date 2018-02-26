@@ -940,5 +940,7 @@ class Airship
         group['id'] = id_str
       end
     end
+
+    nil
   end
 end
