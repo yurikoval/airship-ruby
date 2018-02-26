@@ -656,6 +656,7 @@ class Airship
     end
 
     sampled_inside_base_population = false
+    is_eligible = false
     control_info['rule_sets'].each do |rule_set|
       if sampled_inside_base_population
         break
@@ -673,6 +674,7 @@ class Airship
       end
 
       if satisfies_all_rules
+        is_eligible = true
         hash_key = "SAMPLING:control_#{control_info['id']}:env_#{@gating_info['env']['id']}:rule_set_#{rule_set['id']}:client_object_#{object['type']}_#{object['id']}"
         if Airship.get_hashed_value(hash_key) <= rule_set['sampling_percentage']
           sampled_inside_base_population = true
@@ -684,7 +686,7 @@ class Airship
       return {
         'is_enabled' => false,
         'variation' => nil,
-        'is_eligible' => false,
+        'is_eligible' => is_eligible,
       }
     end
 
