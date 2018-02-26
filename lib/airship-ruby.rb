@@ -439,6 +439,11 @@ class Airship
     end
     if response.status == 200
       gating_info = JSON.parse(response.body)
+
+      if gating_info['server_info'] == 'maintenance'
+        return
+      end
+
       gating_info_map = self._get_gating_info_map(gating_info)
       @gating_info = gating_info
       @gating_info_map = gating_info_map
