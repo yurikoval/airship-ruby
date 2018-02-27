@@ -19,8 +19,8 @@ airship.init()
 
 # Define your object
 object = {
-  "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar"
-  "id" => "1234", # "id" must be a string, so if you wish to pass an integer, simply convert via .to_s
+  "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar". If omittied, it will default to "User"
+  "id" => "1234", # "id" must be a string or integer
   "display_name" => "ironman@stark.com" # must also be a string
 }
 
