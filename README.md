@@ -10,6 +10,7 @@ require "airship-ruby"
 
 # Create an instance with api_key and env_key
 airship = Airship.new({api_key: <api_key>, env_key: <env_key>})
+# Should be used as a singleton
 
 # e.g.,
 # airship = Airship.new({api_key: "r9b72kqdh1wbzkpkf7gntwfapqoc26bl", env_key: "nxmqp35umrd3djth"})
