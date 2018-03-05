@@ -1,4 +1,12 @@
-# airship-ruby
+<p align="center">
+  <a href="https://airshiphq.com/" target="_blank">
+    <img  alt="Airship" src="https://avatars3.githubusercontent.com/u/29476417?s=200&v=4" class="img-responsive">
+  </a>
+</p>
+
+
+
+# Airship Ruby
 
 ## Installation
 `gem install airship-ruby`
@@ -108,3 +116,10 @@ object = {
 
 airship.enabled?("bitcoin-pay", object)
 ```
+
+___
+
+# License
+ [MIT](/LICENSE)
+
+[![StackShare](https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/airship/airship)
