@@ -515,7 +515,7 @@ class Airship
     if !gate_stats.nil?
       @gate_stats_batch.push(gate_stats)
     end
-    if @gate_stats_batch.size > limit || @first_gate
+    if @gate_stats_batch.size > limit || (@first_gate && @gate_stats_batch.size > 0)
       @first_gate = false
       new_gate_stats_uploader_tasks = []
       @gate_stats_uploader_tasks.each do |task|
