@@ -30,6 +30,9 @@ class Airship
         "maxLength" => 250,
         "minLength" => 1,
       },
+      "is_anonymous" => {
+        "type" => "boolean",
+      },
       "attributes" => {
         "type" => "object",
         "patternProperties" => {
@@ -222,7 +225,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -286,7 +289,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -350,7 +353,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -939,6 +942,12 @@ class Airship
   def _validate_nesting(object)
     if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
+    end
+  end
+
+  def _validate_anonymous(object)
+    if object['is_anonymous'] == true && !object['group'].nil?
+      return 'An anonymous object cannot belong to a group'
     end
   end
 
