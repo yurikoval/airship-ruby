@@ -18,6 +18,9 @@ airship = Airship.new({api_key: <api_key>, env_key: <env_key>})
 # Initialize the instance. After init, the instance becomes thread-safe
 airship.init()
 
+# You can also combine into one line:
+airship = Airship.new({api_key: "r9b72kqdh1wbzkpkf7gntwfapqoc26bl", env_key: "nxmqp35umrd3djth"}).init()
+
 # Define your object
 object = {
   "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar". If omittied, it will default to "User"
