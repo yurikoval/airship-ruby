@@ -30,6 +30,9 @@ class Airship
         "maxLength" => 250,
         "minLength" => 1,
       },
+      "is_anonymous" => {
+        "type" => "boolean",
+      },
       "attributes" => {
         "type" => "object",
         "patternProperties" => {
@@ -185,6 +188,8 @@ class Airship
 
     @initialization_lock = Concurrent::Semaphore.new(1)
     @gate_stats_batch_lock = Concurrent::Semaphore.new(1)
+
+    @first_gate = true
   end
 
   def init
@@ -220,7 +225,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -284,7 +289,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -348,7 +353,7 @@ class Airship
       object['type'] = 'User'
     end
 
-    error = self._validate_nesting(object) || self._maybe_transform_id(object)
+    error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
     if !error.nil?
       puts error
@@ -513,7 +518,8 @@ class Airship
     if !gate_stats.nil?
       @gate_stats_batch.push(gate_stats)
     end
-    if @gate_stats_batch.size > limit
+    if @gate_stats_batch.size > limit || (@first_gate && @gate_stats_batch.size > 0)
+      @first_gate = false
       new_gate_stats_uploader_tasks = []
       @gate_stats_uploader_tasks.each do |task|
         if !task.fulfilled?
@@ -936,6 +942,16 @@ class Airship
   def _validate_nesting(object)
     if object['is_group'] == true && !object['group'].nil?
       return 'A group cannot be nested inside another group'
+    end
+  end
+
+  def _validate_anonymous(object)
+    if object['is_anonymous'] == true && !object['group'].nil?
+      return 'An anonymous object cannot belong to a group'
+    end
+
+    if object['is_group'] === true && object['is_anonymous'] === true
+      return 'A group cannot be anonymous'
     end
   end
 
