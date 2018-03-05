@@ -257,6 +257,8 @@ class Airship
       stats['sdk_gate_eligibility'] = is_eligible
       stats['sdk_gate_type'] = 'value'
 
+      self._enrich_with_metadata(control_short_name, stats)
+
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
 
@@ -318,6 +320,8 @@ class Airship
       stats['sdk_gate_variation'] = variation
       stats['sdk_gate_eligibility'] = is_eligible
       stats['sdk_gate_type'] = 'variation'
+
+      self._enrich_with_metadata(control_short_name, stats)
 
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
@@ -381,6 +385,8 @@ class Airship
       stats['sdk_gate_eligibility'] = is_eligible
       stats['sdk_gate_type'] = 'eligibility'
 
+      self._enrich_with_metadata(control_short_name, stats)
+
       stats['sdk_version'] = sdk_version
       stats['sdk_id'] = @@sdk_id
 
@@ -393,6 +399,16 @@ class Airship
   end
 
   protected
+
+  def _enrich_with_metadata(control_short_name, stats)
+    control_info = @gating_info_map[control_short_name]
+
+    if !control_info.nil?
+      stats['sdk_gate_control_id'] = control_info['id']
+    end
+
+    stats['sdk_env_id'] = @gating_info['env']['id']
+  end
 
   def _get_gating_info_map(gating_info)
     map = {}
