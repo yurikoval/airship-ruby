@@ -204,6 +204,7 @@ class Airship
       @gate_stats_watcher.execute
     end
     @initialization_lock.release
+    self
   end
 
   def enabled?(control_short_name, object, default_value=false)
