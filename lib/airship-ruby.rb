@@ -185,6 +185,8 @@ class Airship
 
     @initialization_lock = Concurrent::Semaphore.new(1)
     @gate_stats_batch_lock = Concurrent::Semaphore.new(1)
+
+    @first_gate = true
   end
 
   def init
@@ -513,7 +515,8 @@ class Airship
     if !gate_stats.nil?
       @gate_stats_batch.push(gate_stats)
     end
-    if @gate_stats_batch.size > limit
+    if @gate_stats_batch.size > limit || @first_gate
+      @first_gate = false
       new_gate_stats_uploader_tasks = []
       @gate_stats_uploader_tasks.each do |task|
         if !task.fulfilled?
