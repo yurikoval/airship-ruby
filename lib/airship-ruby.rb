@@ -949,6 +949,10 @@ class Airship
     if object['is_anonymous'] == true && !object['group'].nil?
       return 'An anonymous object cannot belong to a group'
     end
+
+    if object['is_group'] === true && object['is_anonymous'] === true
+      return 'A group cannot be anonymous'
+    end
   end
 
   def _maybe_transform_id(object)
