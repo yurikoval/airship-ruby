@@ -41,6 +41,8 @@ airship.variation("bitcoin-pay", object) # Get the variation associated with a m
 airship.eligible?("bitcoin-pay", object)
 # Returns true if the object can potentially receive the feature via sampling
 # or is already receiving the feature.
+
+# Note: It may take up to a minute for objects gated to show up on our web app.
 ```
 
 
