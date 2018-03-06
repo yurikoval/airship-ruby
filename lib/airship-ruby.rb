@@ -213,6 +213,8 @@ class Airship
   end
 
   def enabled?(control_short_name, object, default_value=false)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -277,6 +279,8 @@ class Airship
   end
 
   def variation(control_short_name, object, default_value=nil)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -341,6 +345,8 @@ class Airship
   end
 
   def eligible?(control_short_name, object, default_value=false)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -405,6 +411,18 @@ class Airship
   end
 
   protected
+
+  def _shallow_copy(object)
+    copy = {}
+    if object.is_a?(Hash)
+      object.each do |key, value|
+        copy[key.to_s] = self._shallow_copy(value)
+      end
+    else
+      return object
+    end
+    copy
+  end
 
   def _enrich_with_metadata(control_short_name, stats)
     control_info = @gating_info_map[control_short_name]
