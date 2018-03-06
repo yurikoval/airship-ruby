@@ -98,11 +98,11 @@ class Airship
             "additionalProperties" => false,
           },
         },
-        "required" => ["id", "display_name"],
+        "required" => ["id"],
         "additionalProperties" => false,
       },
     },
-    "required" => ["id", "display_name"],
+    "required" => ["id"],
     "additionalProperties" => false,
   }
 
@@ -223,9 +223,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -289,9 +287,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -355,9 +351,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -422,16 +416,6 @@ class Airship
       return object
     end
     copy
-  end
-
-  def _enrich_with_metadata(control_short_name, stats)
-    control_info = @gating_info_map[control_short_name]
-
-    if !control_info.nil?
-      stats['sdk_gate_control_id'] = control_info['id']
-    end
-
-    stats['sdk_env_id'] = @gating_info['env']['id']
   end
 
   def _get_gating_info_map(gating_info)
@@ -998,5 +982,21 @@ class Airship
     end
 
     nil
+  end
+
+  def _enrich_with_metadata(control_short_name, stats)
+    control_info = @gating_info_map[control_short_name]
+
+    if !control_info.nil?
+      stats['sdk_gate_control_id'] = control_info['id']
+    end
+
+    stats['sdk_env_id'] = @gating_info['env']['id']
+  end
+
+  def _maybe_add_fields(object)
+    if object['type'].nil?
+      object['type'] = 'User'
+    end
   end
 end
