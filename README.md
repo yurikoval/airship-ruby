@@ -26,15 +26,16 @@ airship = Airship.new({api_key: <api_key>, env_key: <env_key>})
 # Initialize the instance. After init, the instance becomes thread-safe
 airship.init()
 
-# You can also combine into one line:
+# Can combine into one line:
 airship = Airship.new({api_key: "r9b72kqdh1wbzkpkf7gntwfapqoc26bl", env_key: "nxmqp35umrd3djth"}).init()
 
 # Define your object
 object = {
   "type" => "User", # "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar". If omittied, it will default to "User"
   "id" => "1234", # "id" must be a string or integer
-  "display_name" => "ironman@stark.com" # must also be a string
+  "display_name" => "ironman@stark.com" # must be a string. If omitted, the SDK will use the same value as "id" (converted to a string)
 }
+# Note: Can use symbols for the keys inside the Hash
 
 airship.enabled?("bitcoin-pay", object) # Does the object have the feature "bitcoin-pay"?
 airship.variation("bitcoin-pay", object) # Get the variation associated with a multi-variate flag
