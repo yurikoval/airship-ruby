@@ -98,11 +98,11 @@ class Airship
             "additionalProperties" => false,
           },
         },
-        "required" => ["id", "display_name"],
+        "required" => ["id"],
         "additionalProperties" => false,
       },
     },
-    "required" => ["id", "display_name"],
+    "required" => ["id"],
     "additionalProperties" => false,
   }
 
@@ -213,6 +213,8 @@ class Airship
   end
 
   def enabled?(control_short_name, object, default_value=false)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -221,9 +223,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -277,6 +277,8 @@ class Airship
   end
 
   def variation(control_short_name, object, default_value=nil)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -285,9 +287,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -341,6 +341,8 @@ class Airship
   end
 
   def eligible?(control_short_name, object, default_value=false)
+    object = self._shallow_copy(object)
+
     validation_errors = JSON::Validator.fully_validate(SCHEMA, object)
     if validation_errors.size > 0
       puts validation_errors[0]
@@ -349,9 +351,7 @@ class Airship
 
     object = self._clone_object(object)
 
-    if object['type'].nil?
-      object['type'] = 'User'
-    end
+    self._maybe_add_fields(object)
 
     error = self._validate_nesting(object) || self._validate_anonymous(object) || self._maybe_transform_id(object)
 
@@ -406,14 +406,16 @@ class Airship
 
   protected
 
-  def _enrich_with_metadata(control_short_name, stats)
-    control_info = @gating_info_map[control_short_name]
-
-    if !control_info.nil?
-      stats['sdk_gate_control_id'] = control_info['id']
+  def _shallow_copy(object)
+    copy = {}
+    if object.is_a?(Hash)
+      object.each do |key, value|
+        copy[key.to_s] = self._shallow_copy(value)
+      end
+    else
+      return object
     end
-
-    stats['sdk_env_id'] = @gating_info['env']['id']
+    copy
   end
 
   def _get_gating_info_map(gating_info)
@@ -980,5 +982,29 @@ class Airship
     end
 
     nil
+  end
+
+  def _enrich_with_metadata(control_short_name, stats)
+    control_info = @gating_info_map[control_short_name]
+
+    if !control_info.nil?
+      stats['sdk_gate_control_id'] = control_info['id']
+    end
+
+    stats['sdk_env_id'] = @gating_info['env']['id']
+  end
+
+  def _maybe_add_fields(object)
+    if object['type'].nil?
+      object['type'] = 'User'
+    end
+
+    if object['display_name'].nil?
+      object['display_name'] = object['id'].to_s
+    end
+
+    if !object['group'].nil? && object['group']['display_name'].nil?
+      object['group']['display_name'] = object['group']['id'].to_s
+    end
   end
 end
