@@ -998,5 +998,13 @@ class Airship
     if object['type'].nil?
       object['type'] = 'User'
     end
+
+    if object['display_name'].nil?
+      object['display_name'] = object['id'].to_s
+    end
+
+    if !object['group'].nil? && object['group']['display_name'].nil?
+      object['group']['display_name'] = object['group']['id'].to_s
+    end
   end
 end
