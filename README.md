@@ -37,6 +37,17 @@ object = {
 }
 # Note: Can use symbols for the keys inside the Hash
 
+# The most compact form can be:
+object = {
+  id: 1234
+}
+# as this will translate into:
+object = {
+  "type" => "User",
+  "id" => "1234",
+  "displayName" => "1234"
+}
+
 airship.enabled?("bitcoin-pay", object) # Does the object have the feature "bitcoin-pay"?
 airship.variation("bitcoin-pay", object) # Get the variation associated with a multi-variate flag
 airship.eligible?("bitcoin-pay", object)
