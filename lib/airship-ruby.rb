@@ -22,6 +22,7 @@ class Airship
       },
       "id" => {
         "type" => ["string", "integer"],
+        "pattern" => "^[ -~]+$",
         "maxLength" => 250,
         "minLength" => 1,
       },
@@ -68,6 +69,7 @@ class Airship
           },
           "id" => {
             "type" => ["string", "integer"],
+            "pattern" => "^[ -~]+$",
             "maxLength" => 250,
             "minLength" => 1,
           },
